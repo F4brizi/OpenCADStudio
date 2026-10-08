@@ -584,8 +584,7 @@ pub(super) struct OpenCADStudio {
     /// (GRIPOBJLIMIT, 0..=32767; 0 = no limit).
     grip_object_limit: i32,
     ncopy_bind: bool,
-    /// Viewport mouse move throttle in milliseconds (0 = unlimited).
-    mouse_throttle_ms: u32,
+
     /// Drawing viewport cursor style (CURSORTYPE).
     cursor_type: settings::CursorType,
     /// Explicit crosshair colour; `None` retains automatic contrast.
@@ -760,10 +759,7 @@ pub(super) struct OpenCADStudio {
     /// `HOVER_DWELL_MS`. Skipping the pick mid-stroke avoids the per-frame
     /// O(N) wire+hatch+mesh sweep that froze the cursor on large drawings.
     hover_dwell: Option<HoverDwell>,
-    /// Last instant when a full viewport movement pass was dispatched.
-    last_viewport_move_instant: Option<std::time::Instant>,
-    /// Pending coalesced viewport cursor move waiting for next frame flush.
-    pending_viewport_move: Option<Point>,
+
     /// Constraint kind shown after the ordinary rollover dwell while the
     /// cursor remains over one of its viewport indicators.
     constraint_glyph_tooltip: Option<crate::scene::parametric_constraints::ConstraintKind>,
@@ -2769,7 +2765,6 @@ pub enum Message {
     /// never fall through and rotate a different camera.
     ViewportClick(Option<codec::Handle>),
     ViewportMove(Point),
-    ViewportMoveTick,
     ViewportLeftPress,
     ViewportLeftRelease,
     ViewportRightPress,
@@ -4172,7 +4167,7 @@ impl OpenCADStudio {
             right_click_hold_ms: 250,
             grip_object_limit: settings::DEFAULT_GRIP_OBJECT_LIMIT,
             ncopy_bind: false,
-            mouse_throttle_ms: 0,
+
             cursor_type: settings::CursorType::Crosshair,
             crosshair_color: None,
             crosshair_color_input: String::new(),
@@ -4257,8 +4252,7 @@ impl OpenCADStudio {
             grip_add_provisional: None,
             grip_preview_handles: Vec::new(),
             hover_dwell: None,
-            last_viewport_move_instant: None,
-            pending_viewport_move: None,
+
             constraint_glyph_tooltip: None,
             grip_originals: Vec::new(),
             grip_history_originals: Vec::new(),
@@ -4750,9 +4744,7 @@ impl OpenCADStudio {
         // `--read-only` disables saving. `--script` queues command lines.
         let cfg = crate::cli::gui_config();
         s.read_only = cfg.read_only;
-        if let Some(throttle) = cfg.mouse_throttle_ms {
-            s.mouse_throttle_ms = throttle;
-        }
+
         if let Some(c) = &cfg.cursor {
             match c.to_ascii_lowercase().as_str() {
                 "pointer" | "desktop" | "1" => {

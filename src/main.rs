@@ -209,11 +209,6 @@ fn main() -> iced::Result {
         let saved_compat = OpenCADStudio::gpu_backend::load_prefs().compat_renderer;
         let compat_renderer = args.compat_renderer || saved_compat || gpu.compat_renderer;
         let gpu_compat_auto = !args.compat_renderer && !saved_compat && gpu.compat_renderer;
-        let mouse_throttle_ms = if args.no_throttle {
-            Some(0)
-        } else {
-            args.mouse_throttle
-        };
         let _ = cli::GUI_CONFIG.set(cli::GuiConfig {
             files: if args.new { Vec::new() } else { args.files },
             new: args.new,
@@ -224,7 +219,6 @@ fn main() -> iced::Result {
             gpu_compat_auto,
             cursor: args.cursor,
             no_vsync: vsync_disabled,
-            mouse_throttle_ms,
         });
 
         // Register (or refresh) the freedesktop DWG thumbnailer so file managers

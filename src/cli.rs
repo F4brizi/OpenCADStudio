@@ -80,15 +80,7 @@ pub struct Cli {
     #[arg(help = crate::t!("Disable V-Sync for immediate frame presentation.").into_owned(), long_help = None)]
     pub no_vsync: bool,
 
-    /// Throttle viewport mouse move events in milliseconds (e.g. 16 for 60 FPS, 33 for 30 FPS, 0 for unlimited).
-    #[arg(long, value_name = "MS")]
-    #[arg(help = crate::t!("Throttle viewport mouse move events in milliseconds (0 = unlimited).").into_owned(), long_help = None)]
-    pub mouse_throttle: Option<u32>,
 
-    /// Disable mouse move throttling (process every mouse event immediately; equivalent to --mouse-throttle 0).
-    #[arg(long)]
-    #[arg(help = crate::t!("Process every mouse event immediately without throttling.").into_owned(), long_help = None)]
-    pub no_throttle: bool,
 
     /// Run the headless JSON automation server (stdin/stdout, or --port).
     #[arg(long)]
@@ -176,8 +168,6 @@ pub struct GuiConfig {
     pub cursor: Option<String>,
     /// Disable V-Sync for immediate frame presentation.
     pub no_vsync: bool,
-    /// Viewport mouse move throttle override in milliseconds (None = read from settings.json).
-    pub mouse_throttle_ms: Option<u32>,
 }
 
 /// Set once by `main` before the GUI boots; read by `app::boot`.

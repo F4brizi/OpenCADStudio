@@ -430,9 +430,7 @@ pub struct UserSettings {
     pub selection_cycling: bool,
     /// CURSORTYPE: crosshair or the platform pointer over the drawing.
     pub cursor_type: CursorType,
-    /// Viewport mouse move throttle in milliseconds (0 = unlimited / real-time, 16 = ~60 FPS, 33 = ~30 FPS).
-    #[serde(default)]
-    pub mouse_throttle_ms: u32,
+
     /// Explicit crosshair RGB. `None` keeps automatic background contrast.
     pub crosshair_color: Option<[u8; 3]>,
     /// Explicit object-snap marker RGB. `None` keeps the automatic colour.
@@ -828,7 +826,7 @@ impl Default for UserSettings {
             field_display: true,
             ncopy_bind: false,
             cursor_type: CursorType::Crosshair,
-            mouse_throttle_ms: 0,
+
             crosshair_color: None,
             snap_marker_color: None,
             lineweight_display_scale: 100,
