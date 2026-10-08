@@ -119,17 +119,15 @@ pub enum CursorType {
     #[default]
     Crosshair,
     Pointer,
-    Hybrid,
 }
 
 impl CursorType {
-    pub const ALL: [Self; 3] = [Self::Crosshair, Self::Pointer, Self::Hybrid];
+    pub const ALL: [Self; 2] = [Self::Crosshair, Self::Pointer];
 
     pub fn label(self) -> &'static str {
         match self {
             Self::Crosshair => "Crosshair",
             Self::Pointer => "Desktop pointer",
-            Self::Hybrid => "Hybrid (Desktop arrow + Crosshair)",
         }
     }
 }
@@ -430,7 +428,6 @@ pub struct UserSettings {
     pub selection_cycling: bool,
     /// CURSORTYPE: crosshair or the platform pointer over the drawing.
     pub cursor_type: CursorType,
-
     /// Explicit crosshair RGB. `None` keeps automatic background contrast.
     pub crosshair_color: Option<[u8; 3]>,
     /// Explicit object-snap marker RGB. `None` keeps the automatic colour.
@@ -826,7 +823,6 @@ impl Default for UserSettings {
             field_display: true,
             ncopy_bind: false,
             cursor_type: CursorType::Crosshair,
-
             crosshair_color: None,
             snap_marker_color: None,
             lineweight_display_scale: 100,

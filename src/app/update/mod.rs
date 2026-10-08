@@ -3744,11 +3744,7 @@ impl OpenCADStudio {
 
             Message::ViewportMove(p) => self.on_viewport_move(p),
 
-
-            Message::ViewportExit => {
-
-                self.on_viewport_exit()
-            }
+            Message::ViewportExit => self.on_viewport_exit(),
 
             // ── Per-pane Model viewport ───────────────────────────────────
             Message::PaneResized(ev) => self.on_pane_resized(ev),
@@ -3820,7 +3816,6 @@ impl OpenCADStudio {
             }
 
             Message::ViewportLeftPress => {
-
                 let sweep = self.sync_active_field_if_any();
                 Task::batch(vec![sweep, self.on_viewport_left_press()])
             }
@@ -3828,7 +3823,6 @@ impl OpenCADStudio {
             Message::ViewportLeftRelease => self.on_viewport_left_release(),
 
             Message::ViewportRightPress => {
-
                 let i = self.active_tab;
                 self.ribbon.close_dropdown();
                 // Shift+RMB: the one-shot snap override menu at the cursor —
@@ -3930,10 +3924,7 @@ impl OpenCADStudio {
                 self.unfocus_widgets()
             }
 
-            Message::ViewportMiddlePress => {
-
-                Task::batch(vec![self.on_viewport_middle_press()])
-            }
+            Message::ViewportMiddlePress => self.on_viewport_middle_press(),
 
             Message::ViewportMiddleRelease => {
                 let i = self.active_tab;
@@ -3948,10 +3939,7 @@ impl OpenCADStudio {
                 Task::none()
             }
 
-            Message::ViewportScroll(delta) => {
-
-                Task::batch(vec![self.on_viewport_scroll(delta)])
-            }
+            Message::ViewportScroll(delta) => self.on_viewport_scroll(delta),
 
             Message::ViewportClick(viewport) => self.on_viewport_click(viewport),
 

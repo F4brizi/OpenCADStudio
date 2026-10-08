@@ -1089,8 +1089,6 @@ impl OpenCADStudio {
                 .is_some_and(|session| session.document_id == self.tabs[i].id)
     }
 
-
-
     pub(in crate::app) fn on_viewport_move(&mut self, p: Point) -> Task<Message> {
         // A ribbon dropdown is open over the viewport. Its backdrop
         // cannot swallow cursor motion — in iced 0.14 mouse_area/opaque
@@ -1102,11 +1100,6 @@ impl OpenCADStudio {
             return Task::none();
         }
         let i = self.active_tab;
-
-
-
-        self.tabs[i].scene.selection.borrow_mut().last_move_pos = Some(p);
-
         self.constraint_glyph_tooltip = None;
         let constraint_hover = self
             .constraint_glyph_under(i, p)

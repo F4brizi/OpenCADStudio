@@ -2582,7 +2582,6 @@ impl OpenCADStudio {
         } else {
             Subscription::none()
         };
-
         // Interaction LOD: while the view is (or just was) navigating, keep
         // requesting frames a little past the settle point. Panning itself is
         // driven by input events, but once the cursor stops no event would fire
@@ -2864,7 +2863,6 @@ impl OpenCADStudio {
             layout_settle,
             grip_dwell,
             hover_dwell,
-
             nav_settle,
             gpu_probe,
             thumbnail_capture,

@@ -217,7 +217,6 @@ fn main() -> iced::Result {
             script_lines,
             gpu_fallback_notice,
             gpu_compat_auto,
-            cursor: args.cursor,
             no_vsync: vsync_disabled,
         });
 

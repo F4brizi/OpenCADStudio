@@ -1338,7 +1338,7 @@ impl canvas::Program<Message> for SelectionCanvas {
             }
             // Ghost card dragged under the cursor — a 0.32× preview of the
             // source pane, centred on the cursor.
-            if let Some(c) = cursor.position_in(bounds).or(self.selection.borrow().last_move_pos) {
+            if let Some(c) = self.selection.borrow().last_move_pos {
                 let gw = (src.width * 0.32).clamp(60.0, 280.0);
                 let gh = (src.height * 0.32).clamp(40.0, 200.0);
                 let g = canvas::Path::rectangle(
@@ -1424,7 +1424,7 @@ impl canvas::Program<Message> for SelectionCanvas {
             if self.selection_visual.area && self.selection_visual.opacity > 0 {
                 let alpha = selection_fill_alpha(self.selection_visual.opacity as f32, canvas_light);
                 let fill = base.scale_alpha(alpha);
-                if let Some(cur) = cursor.position_in(bounds).or(self.selection.borrow().last_move_pos) {
+                if let Some(cur) = self.selection.borrow().last_move_pos {
                     let start = self.selection.borrow().poly_points[0];
                     let fill_path = canvas::Path::new(|p| {
                         p.move_to(start);
@@ -1459,7 +1459,7 @@ impl canvas::Program<Message> for SelectionCanvas {
                 ..Default::default()
             };
             frame.stroke(&path, stroke_style.clone());
-            if let Some(cur) = cursor.position_in(bounds).or(self.selection.borrow().last_move_pos) {
+            if let Some(cur) = self.selection.borrow().last_move_pos {
                 let start = self.selection.borrow().poly_points[0];
                 let last = *self.selection.borrow().poly_points.last().unwrap();
                 let preview = canvas::Path::new(|p| {
@@ -1896,9 +1896,9 @@ impl canvas::Program<Message> for SelectionCanvas {
             && !over_divider
             && self.nav == NavCursor::None
             && !self.suppressed
-            && self.crosshair.cursor_type != CursorType::Pointer
+            && self.crosshair.cursor_type == CursorType::Crosshair
         {
-            if let Some(cp) = cursor.position_in(bounds).or(self.selection.borrow().last_move_pos) {
+            if let Some(cp) = self.selection.borrow().last_move_pos {
                 let [r, g, b, a] = self.crosshair.color.map_or_else(
                     || {
                         crate::scene::view::render::adapt_to_bg(

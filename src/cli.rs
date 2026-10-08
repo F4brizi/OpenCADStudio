@@ -70,17 +70,10 @@ pub struct Cli {
     #[arg(help = crate::t!("Use the renderer for GPUs without shader storage buffers.").into_owned(), long_help = None)]
     pub compat_renderer: bool,
 
-    /// Cursor style (crosshair, pointer, hybrid).
-    #[arg(long, value_name = "TYPE")]
-    #[arg(help = crate::t!("Cursor type: crosshair, pointer (desktop arrow), or hybrid (both).").into_owned(), long_help = None)]
-    pub cursor: Option<String>,
-
     /// Disable vertical synchronization (V-Sync) for immediate presentation mode and lower input latency.
     #[arg(long, visible_alias = "immediate")]
     #[arg(help = crate::t!("Disable V-Sync for immediate frame presentation.").into_owned(), long_help = None)]
     pub no_vsync: bool,
-
-
 
     /// Run the headless JSON automation server (stdin/stdout, or --port).
     #[arg(long)]
@@ -164,8 +157,6 @@ pub struct GuiConfig {
     /// The GPU probe found no shader storage buffers: the packed
     /// compatibility renderer was enabled automatically for this session.
     pub gpu_compat_auto: bool,
-    /// Explicit cursor type requested via CLI.
-    pub cursor: Option<String>,
     /// Disable V-Sync for immediate frame presentation.
     pub no_vsync: bool,
 }
