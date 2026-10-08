@@ -101,9 +101,12 @@ fn main() -> iced::Result {
             let _ = env_logger::try_init();
         }
 
-        // Latency tuning: disable V-Sync at the wgpu and driver levels when requested.
+        // Latency tuning: disable V-Sync at the driver and compositor levels when requested.
+        // We set `vblank_mode=0` for Mesa OpenGL. For wgpu/iced, `vsync: false`
+        // uses `AutoNoVsync`, which negotiates Immediate/Mailbox when supported,
+        // and safely falls back to Fifo on drivers reporting only [Fifo] without panicking.
         if args.no_vsync {
-            std::env::set_var("ICED_PRESENT_MODE", "immediate");
+            std::env::remove_var("ICED_PRESENT_MODE");
             std::env::set_var("vblank_mode", "0");
         }
 
