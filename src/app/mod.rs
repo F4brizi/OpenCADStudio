@@ -758,6 +758,10 @@ pub(super) struct OpenCADStudio {
     /// `HOVER_DWELL_MS`. Skipping the pick mid-stroke avoids the per-frame
     /// O(N) wire+hatch+mesh sweep that froze the cursor on large drawings.
     hover_dwell: Option<HoverDwell>,
+    /// Last instant when a full viewport movement pass was dispatched.
+    last_viewport_move_instant: Option<std::time::Instant>,
+    /// Pending coalesced viewport cursor move waiting for next frame flush.
+    pending_viewport_move: Option<Point>,
     /// Constraint kind shown after the ordinary rollover dwell while the
     /// cursor remains over one of its viewport indicators.
     constraint_glyph_tooltip: Option<crate::scene::parametric_constraints::ConstraintKind>,
@@ -2760,6 +2764,7 @@ pub enum Message {
     /// never fall through and rotate a different camera.
     ViewportClick(Option<codec::Handle>),
     ViewportMove(Point),
+    ViewportMoveTick,
     ViewportLeftPress,
     ViewportLeftRelease,
     ViewportRightPress,
@@ -4246,6 +4251,8 @@ impl OpenCADStudio {
             grip_add_provisional: None,
             grip_preview_handles: Vec::new(),
             hover_dwell: None,
+            last_viewport_move_instant: None,
+            pending_viewport_move: None,
             constraint_glyph_tooltip: None,
             grip_originals: Vec::new(),
             grip_history_originals: Vec::new(),

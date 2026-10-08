@@ -1089,6 +1089,38 @@ impl OpenCADStudio {
                 .is_some_and(|session| session.document_id == self.tabs[i].id)
     }
 
+    pub(in crate::app) fn handle_viewport_move(&mut self, p: Point) -> Task<Message> {
+        if self.ribbon.open_dropdown.is_some() || self.color_pick_target.is_some() {
+            return Task::none();
+        }
+        const THROTTLE_MS: u128 = 16;
+        let now = Instant::now();
+        let should_throttle = if let Some(last) = self.last_viewport_move_instant {
+            now.duration_since(last).as_millis() < THROTTLE_MS
+        } else {
+            false
+        };
+
+        if should_throttle {
+            self.pending_viewport_move = Some(p);
+            self.cursor_pos = p;
+            Task::none()
+        } else {
+            self.pending_viewport_move = None;
+            self.last_viewport_move_instant = Some(now);
+            self.on_viewport_move(p)
+        }
+    }
+
+    pub(in crate::app) fn flush_pending_viewport_move(&mut self) -> Task<Message> {
+        if let Some(p) = self.pending_viewport_move.take() {
+            self.last_viewport_move_instant = Some(Instant::now());
+            self.on_viewport_move(p)
+        } else {
+            Task::none()
+        }
+    }
+
     pub(in crate::app) fn on_viewport_move(&mut self, p: Point) -> Task<Message> {
         // A ribbon dropdown is open over the viewport. Its backdrop
         // cannot swallow cursor motion — in iced 0.14 mouse_area/opaque
@@ -1100,6 +1132,30 @@ impl OpenCADStudio {
             return Task::none();
         }
         let i = self.active_tab;
+
+        // Sub-pixel mouse motion filter (< 0.5px):
+        // When idling (no active command, drag, or grip edit), if mouse displacement
+        // is below 0.5 screen pixels (dx^2 + dy^2 < 0.25), ignore sub-pixel sensor
+        // jitter to prevent mice from thrashing CPU and GPU.
+        {
+            let sel_ref = self.tabs[i].scene.selection.borrow();
+            if let Some(prev_p) = sel_ref.last_move_pos {
+                let dx = p.x - prev_p.x;
+                let dy = p.y - prev_p.y;
+                let dist2 = dx * dx + dy * dy;
+                if dist2 < 0.25
+                    && self.tabs[i].active_cmd.is_none()
+                    && self.tabs[i].active_grip.is_none()
+                    && self.ucs_grip_drag.is_none()
+                    && !sel_ref.left_down
+                    && !sel_ref.middle_down
+                    && !sel_ref.right_down
+                {
+                    return Task::none();
+                }
+            }
+        }
+
         self.constraint_glyph_tooltip = None;
         let constraint_hover = self
             .constraint_glyph_under(i, p)

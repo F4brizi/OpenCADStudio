@@ -2582,6 +2582,11 @@ impl OpenCADStudio {
         } else {
             Subscription::none()
         };
+        let viewport_move_tick = if self.pending_viewport_move.is_some() {
+            window::frames().map(|_| Message::ViewportMoveTick)
+        } else {
+            Subscription::none()
+        };
         // Interaction LOD: while the view is (or just was) navigating, keep
         // requesting frames a little past the settle point. Panning itself is
         // driven by input events, but once the cursor stops no event would fire
@@ -2863,6 +2868,7 @@ impl OpenCADStudio {
             layout_settle,
             grip_dwell,
             hover_dwell,
+            viewport_move_tick,
             nav_settle,
             gpu_probe,
             thumbnail_capture,
