@@ -101,6 +101,12 @@ fn main() -> iced::Result {
             let _ = env_logger::try_init();
         }
 
+        // Latency tuning: disable V-Sync at the wgpu and driver levels when requested.
+        if args.no_vsync {
+            std::env::set_var("ICED_PRESENT_MODE", "immediate");
+            std::env::set_var("vblank_mode", "0");
+        }
+
         // GPU backend selection. Explicit `--backend` wins; `--safe-mode`
         // forces GL for flaky drivers. On Windows the preference order starts
         // with DX12/Vulkan so the AMD OpenGL ICD (atio6axx.dll) is never
@@ -205,6 +211,9 @@ fn main() -> iced::Result {
             script_lines,
             gpu_fallback_notice,
             gpu_compat_auto,
+            cursor: args.cursor,
+            no_vsync: args.no_vsync,
+            fast_cursor: args.fast_cursor,
         });
 
         // Register (or refresh) the freedesktop DWG thumbnailer so file managers

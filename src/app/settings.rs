@@ -119,15 +119,17 @@ pub enum CursorType {
     #[default]
     Crosshair,
     Pointer,
+    Hybrid,
 }
 
 impl CursorType {
-    pub const ALL: [Self; 2] = [Self::Crosshair, Self::Pointer];
+    pub const ALL: [Self; 3] = [Self::Crosshair, Self::Pointer, Self::Hybrid];
 
     pub fn label(self) -> &'static str {
         match self {
             Self::Crosshair => "Crosshair",
             Self::Pointer => "Desktop pointer",
+            Self::Hybrid => "Hybrid (Desktop arrow + Crosshair)",
         }
     }
 }

@@ -1095,7 +1095,9 @@ impl OpenCADStudio {
         }
         const THROTTLE_MS: u128 = 16;
         let now = Instant::now();
-        let should_throttle = if let Some(last) = self.last_viewport_move_instant {
+        let should_throttle = if self.fast_cursor {
+            false
+        } else if let Some(last) = self.last_viewport_move_instant {
             now.duration_since(last).as_millis() < THROTTLE_MS
         } else {
             false
@@ -1104,6 +1106,9 @@ impl OpenCADStudio {
         if should_throttle {
             self.pending_viewport_move = Some(p);
             self.cursor_pos = p;
+            if let Some(tab) = self.tabs.get(self.active_tab) {
+                tab.scene.selection.borrow_mut().last_move_pos = Some(p);
+            }
             Task::none()
         } else {
             self.pending_viewport_move = None;
@@ -1137,7 +1142,7 @@ impl OpenCADStudio {
         // When idling (no active command, drag, or grip edit), if mouse displacement
         // is below 0.5 screen pixels (dx^2 + dy^2 < 0.25), ignore sub-pixel sensor
         // jitter to prevent mice from thrashing CPU and GPU.
-        {
+        if !self.fast_cursor {
             let sel_ref = self.tabs[i].scene.selection.borrow();
             if let Some(prev_p) = sel_ref.last_move_pos {
                 let dx = p.x - prev_p.x;
@@ -1155,6 +1160,8 @@ impl OpenCADStudio {
                 }
             }
         }
+
+        self.tabs[i].scene.selection.borrow_mut().last_move_pos = Some(p);
 
         self.constraint_glyph_tooltip = None;
         let constraint_hover = self

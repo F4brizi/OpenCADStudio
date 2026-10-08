@@ -584,6 +584,8 @@ pub(super) struct OpenCADStudio {
     /// (GRIPOBJLIMIT, 0..=32767; 0 = no limit).
     grip_object_limit: i32,
     ncopy_bind: bool,
+    /// Direct fast-path cursor updating (bypasses move throttling/jitter filter).
+    fast_cursor: bool,
     /// Drawing viewport cursor style (CURSORTYPE).
     cursor_type: settings::CursorType,
     /// Explicit crosshair colour; `None` retains automatic contrast.
@@ -4167,6 +4169,7 @@ impl OpenCADStudio {
             right_click_hold_ms: 250,
             grip_object_limit: settings::DEFAULT_GRIP_OBJECT_LIMIT,
             ncopy_bind: false,
+            fast_cursor: false,
             cursor_type: settings::CursorType::Crosshair,
             crosshair_color: None,
             crosshair_color_input: String::new(),
@@ -4744,6 +4747,23 @@ impl OpenCADStudio {
         // `--read-only` disables saving. `--script` queues command lines.
         let cfg = crate::cli::gui_config();
         s.read_only = cfg.read_only;
+        s.fast_cursor = cfg.fast_cursor;
+        if let Some(c) = &cfg.cursor {
+            match c.to_ascii_lowercase().as_str() {
+                "pointer" | "desktop" | "1" => {
+                    s.cursor_type = settings::CursorType::Pointer;
+                }
+                "hybrid" | "2" => {
+                    s.cursor_type = settings::CursorType::Hybrid;
+                }
+                "crosshair" | "0" => {
+                    s.cursor_type = settings::CursorType::Crosshair;
+                }
+                other => {
+                    s.command_line.push_warning(&format!("Unknown cursor type '{other}'. Valid options: crosshair, pointer, hybrid"));
+                }
+            }
+        }
         // GPU backend / renderer fallback: the resolver ran before iced
         // booted, so surface its verdict here where the user can see it.
         if let Some(notice) = cfg.gpu_fallback_notice {
@@ -4890,6 +4910,7 @@ use std::path::PathBuf;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn run() -> iced::Result {
+    let cfg = crate::cli::gui_config();
     iced::daemon(
         OpenCADStudio::boot,
         OpenCADStudio::update,
@@ -4897,6 +4918,7 @@ pub fn run() -> iced::Result {
     )
     .settings(iced::Settings {
         power_preference: iced::backend::PowerPreference::HighPerformance,
+        vsync: !cfg.no_vsync,
         ..iced::Settings::default()
     })
     .subscription(OpenCADStudio::subscription)

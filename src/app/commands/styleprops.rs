@@ -1892,18 +1892,26 @@ impl OpenCADStudio {
                                 Some(v) => match v.as_str() {
                                     "0" => {
                                         self.cursor_type = crate::app::settings::CursorType::Crosshair;
-                                        Ok(("CURSORTYPE = 0".to_string(), true))
+                                        Ok(("CURSORTYPE = 0 (Crosshair)".to_string(), true))
                                     }
                                     "1" => {
                                         self.cursor_type = crate::app::settings::CursorType::Pointer;
-                                        Ok(("CURSORTYPE = 1".to_string(), true))
+                                        Ok(("CURSORTYPE = 1 (Desktop pointer)".to_string(), true))
                                     }
-                                    _ => Err("SETVAR: 0 or 1 required.".into()),
+                                    "2" => {
+                                        self.cursor_type = crate::app::settings::CursorType::Hybrid;
+                                        Ok(("CURSORTYPE = 2 (Hybrid)".to_string(), true))
+                                    }
+                                    _ => Err("SETVAR: 0, 1 or 2 required.".into()),
                                 },
                                 None => Ok((
                                     format!(
                                         "CURSORTYPE = {}",
-                                        i32::from(self.cursor_type == crate::app::settings::CursorType::Pointer)
+                                        match self.cursor_type {
+                                            crate::app::settings::CursorType::Crosshair => 0,
+                                            crate::app::settings::CursorType::Pointer => 1,
+                                            crate::app::settings::CursorType::Hybrid => 2,
+                                        }
                                     ),
                                     false,
                                 )),
