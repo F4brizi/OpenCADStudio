@@ -1093,12 +1093,12 @@ impl OpenCADStudio {
         if self.ribbon.open_dropdown.is_some() || self.color_pick_target.is_some() {
             return Task::none();
         }
-        const THROTTLE_MS: u128 = 16;
+        let throttle_ms = self.mouse_throttle_ms as u128;
         let now = Instant::now();
-        let should_throttle = if self.fast_cursor {
+        let should_throttle = if throttle_ms == 0 {
             false
         } else if let Some(last) = self.last_viewport_move_instant {
-            now.duration_since(last).as_millis() < THROTTLE_MS
+            now.duration_since(last).as_millis() < throttle_ms
         } else {
             false
         };
@@ -1142,7 +1142,7 @@ impl OpenCADStudio {
         // When idling (no active command, drag, or grip edit), if mouse displacement
         // is below 0.5 screen pixels (dx^2 + dy^2 < 0.25), ignore sub-pixel sensor
         // jitter to prevent mice from thrashing CPU and GPU.
-        if !self.fast_cursor {
+        {
             let sel_ref = self.tabs[i].scene.selection.borrow();
             if let Some(prev_p) = sel_ref.last_move_pos {
                 let dx = p.x - prev_p.x;

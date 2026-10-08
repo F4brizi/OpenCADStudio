@@ -101,11 +101,14 @@ fn main() -> iced::Result {
             let _ = env_logger::try_init();
         }
 
-        // Latency tuning: disable V-Sync at the driver and compositor levels when requested.
+        // Latency tuning: disable V-Sync at the driver and compositor levels when requested
+        // either via CLI (--no-vsync) or persisted in ~/.config/OpenCADStudio/graphics.json.
         // We set `vblank_mode=0` for Mesa OpenGL. For wgpu/iced, `vsync: false`
         // uses `AutoNoVsync`, which negotiates Immediate/Mailbox when supported,
         // and safely falls back to Fifo on drivers reporting only [Fifo] without panicking.
-        if args.no_vsync {
+        let saved_gpu_prefs = OpenCADStudio::gpu_backend::load_prefs();
+        let vsync_disabled = args.no_vsync || !saved_gpu_prefs.vsync;
+        if vsync_disabled {
             std::env::remove_var("ICED_PRESENT_MODE");
             std::env::set_var("vblank_mode", "0");
         }
@@ -206,6 +209,11 @@ fn main() -> iced::Result {
         let saved_compat = OpenCADStudio::gpu_backend::load_prefs().compat_renderer;
         let compat_renderer = args.compat_renderer || saved_compat || gpu.compat_renderer;
         let gpu_compat_auto = !args.compat_renderer && !saved_compat && gpu.compat_renderer;
+        let mouse_throttle_ms = if args.no_throttle {
+            Some(0)
+        } else {
+            args.mouse_throttle
+        };
         let _ = cli::GUI_CONFIG.set(cli::GuiConfig {
             files: if args.new { Vec::new() } else { args.files },
             new: args.new,
@@ -215,8 +223,8 @@ fn main() -> iced::Result {
             gpu_fallback_notice,
             gpu_compat_auto,
             cursor: args.cursor,
-            no_vsync: args.no_vsync,
-            fast_cursor: args.fast_cursor,
+            no_vsync: vsync_disabled,
+            mouse_throttle_ms,
         });
 
         // Register (or refresh) the freedesktop DWG thumbnailer so file managers

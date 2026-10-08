@@ -584,8 +584,8 @@ pub(super) struct OpenCADStudio {
     /// (GRIPOBJLIMIT, 0..=32767; 0 = no limit).
     grip_object_limit: i32,
     ncopy_bind: bool,
-    /// Direct fast-path cursor updating (bypasses move throttling/jitter filter).
-    fast_cursor: bool,
+    /// Viewport mouse move throttle in milliseconds (0 = unlimited).
+    mouse_throttle_ms: u32,
     /// Drawing viewport cursor style (CURSORTYPE).
     cursor_type: settings::CursorType,
     /// Explicit crosshair colour; `None` retains automatic contrast.
@@ -2284,6 +2284,9 @@ pub enum Message {
     /// Options > Graphics: force the packed compatibility renderer.
     #[cfg(not(target_arch = "wasm32"))]
     GraphicsCompatToggled(bool),
+    /// Options > Graphics: toggle vertical synchronization (V-Sync).
+    #[cfg(not(target_arch = "wasm32"))]
+    GraphicsVsyncToggled(bool),
     /// Options > Graphics: prefer OpenGL on older GPUs.
     #[cfg(not(target_arch = "wasm32"))]
     GraphicsLegacyGlToggled(bool),
@@ -4169,7 +4172,7 @@ impl OpenCADStudio {
             right_click_hold_ms: 250,
             grip_object_limit: settings::DEFAULT_GRIP_OBJECT_LIMIT,
             ncopy_bind: false,
-            fast_cursor: false,
+            mouse_throttle_ms: 0,
             cursor_type: settings::CursorType::Crosshair,
             crosshair_color: None,
             crosshair_color_input: String::new(),
@@ -4747,7 +4750,9 @@ impl OpenCADStudio {
         // `--read-only` disables saving. `--script` queues command lines.
         let cfg = crate::cli::gui_config();
         s.read_only = cfg.read_only;
-        s.fast_cursor = cfg.fast_cursor;
+        if let Some(throttle) = cfg.mouse_throttle_ms {
+            s.mouse_throttle_ms = throttle;
+        }
         if let Some(c) = &cfg.cursor {
             match c.to_ascii_lowercase().as_str() {
                 "pointer" | "desktop" | "1" => {

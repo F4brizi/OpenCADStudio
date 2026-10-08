@@ -680,6 +680,7 @@ impl OpenCADStudio {
             field_display: crate::entities::field::display(),
             ncopy_bind: self.ncopy_bind,
             cursor_type: self.cursor_type,
+            mouse_throttle_ms: self.mouse_throttle_ms,
             crosshair_color: self.crosshair_color,
             snap_marker_color: self.snap_marker_color,
             lineweight_display_scale: self.lineweight_display_scale,
@@ -788,6 +789,7 @@ impl OpenCADStudio {
         crate::entities::field::set_display(s.field_display);
         self.ncopy_bind = s.ncopy_bind;
         self.cursor_type = s.cursor_type;
+        self.mouse_throttle_ms = s.mouse_throttle_ms;
         self.crosshair_color = s.crosshair_color;
         self.crosshair_color_input = s
             .crosshair_color

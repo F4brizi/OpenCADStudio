@@ -150,6 +150,8 @@ pub struct GraphicsPrefs {
     pub compat_renderer: bool,
     /// On Windows, prefer OpenGL when the GPU is below the WebGPU baseline.
     pub legacy_gl: bool,
+    /// Vertical synchronization (V-Sync) presentation mode.
+    pub vsync: bool,
 }
 
 impl Default for GraphicsPrefs {
@@ -158,6 +160,7 @@ impl Default for GraphicsPrefs {
             backend: BackendChoice::Auto,
             compat_renderer: false,
             legacy_gl: true,
+            vsync: true,
         }
     }
 }
@@ -191,6 +194,10 @@ pub fn load_prefs() -> GraphicsPrefs {
             .get("legacy_gl")
             .and_then(|x| x.as_bool())
             .unwrap_or(d.legacy_gl),
+        vsync: v
+            .get("vsync")
+            .and_then(|x| x.as_bool())
+            .unwrap_or(d.vsync),
     }
 }
 
@@ -206,6 +213,7 @@ pub fn save_prefs(prefs: GraphicsPrefs) {
         "backend": prefs.backend.as_str().unwrap_or("auto"),
         "compat_renderer": prefs.compat_renderer,
         "legacy_gl": prefs.legacy_gl,
+        "vsync": prefs.vsync,
     });
     let _ = std::fs::write(p, serde_json::to_string_pretty(&json).unwrap_or_default());
 }
