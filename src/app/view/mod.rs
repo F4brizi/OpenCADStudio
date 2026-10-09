@@ -953,7 +953,7 @@ bg={bg_ms:.1}ms n={view_count}"
         };
 
         mark("viewport_mouse");
-        let viewport_mouse = crate::ui::viewport_input::ViewportInput::new();
+        let viewport_mouse = crate::ui::viewport_input::ViewportInput::new(&tab.last_cursor_screen, tab.scene.selection.clone());
 
         let desk_bg = self.model_space.resolve_desk_bg();
         let desk_color = Color {
