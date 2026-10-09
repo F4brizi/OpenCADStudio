@@ -38,7 +38,6 @@ where
     }
 
     fn size(&self) -> Size<Length> {
-
         Size {
             width: Length::Fill,
             height: Length::Fill,
@@ -53,7 +52,6 @@ where
     ) -> layout::Node {
         layout::Node::new(limits.max())
     }
-
     
     fn update(
         &mut self,
@@ -73,13 +71,14 @@ where
         match event {
             Event::Mouse(mouse::Event::CursorMoved { position }) => {
                 let now = std::time::Instant::now();
-                let emit = match state.last_move {
-                    Some(last) => now.duration_since(last).as_millis() > 66, // ~15 fps tick for heavy UI rebuilds/snapping
-                    None => true,
+                let emit = if self.hardware_cursor {
+                    match state.last_move {
+                        Some(last) => now.duration_since(last).as_millis() > 66, // ~15 fps tick for heavy UI rebuilds/snapping
+                        None => true,
+                    }
+                } else {
+                    true
                 };
-                
-                self.last_cursor_screen.set(*position);
-                self.selection.borrow_mut().last_move_pos = Some(*position);
                 
                 if !self.hardware_cursor {
                     shell.request_redraw();
@@ -89,10 +88,12 @@ where
                     if self.hardware_cursor {
                         shell.request_redraw();
                     }
+                    
+                    let local = iced::Point::new(position.x - bounds.x, position.y - bounds.y);
                     if let Some(idx) = self.pane_idx {
-                        shell.publish(Message::PaneMove(idx, *position));
+                        shell.publish(Message::PaneMove(idx, local));
                     } else {
-                        shell.publish(Message::ViewportMove(*position));
+                        shell.publish(Message::ViewportMove(local));
                     }
                     state.last_move = Some(now);
                 }
