@@ -90,6 +90,18 @@ pub(crate) fn view(prefs: GraphicsPrefs, active: ActiveGpu) -> Element<'static, 
         ]
         .spacing(8)
         .align_y(iced::Center),
+        Space::new().height(12),
+        row![
+            checkbox(prefs.vsync)
+                .on_toggle(Message::GraphicsVsyncToggled)
+                .size(15),
+            text(crate::t!(
+                "Vertical synchronization (V-Sync)"
+            ))
+            .size(12),
+        ]
+        .spacing(8)
+        .align_y(iced::Center),
     ];
 
     if cfg!(target_os = "windows") {

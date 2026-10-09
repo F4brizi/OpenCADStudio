@@ -70,6 +70,11 @@ pub struct Cli {
     #[arg(help = crate::t!("Use the renderer for GPUs without shader storage buffers.").into_owned(), long_help = None)]
     pub compat_renderer: bool,
 
+    /// Disable vertical synchronization (V-Sync) for immediate presentation mode and lower input latency.
+    #[arg(long, visible_alias = "immediate")]
+    #[arg(help = crate::t!("Disable V-Sync for immediate frame presentation.").into_owned(), long_help = None)]
+    pub no_vsync: bool,
+
     /// Run the headless JSON automation server (stdin/stdout, or --port).
     #[arg(long)]
     #[arg(help = crate::t!("Run the headless JSON automation server (stdin/stdout, or --port).").into_owned(), long_help = None)]
@@ -152,6 +157,8 @@ pub struct GuiConfig {
     /// The GPU probe found no shader storage buffers: the packed
     /// compatibility renderer was enabled automatically for this session.
     pub gpu_compat_auto: bool,
+    /// Disable V-Sync for immediate frame presentation.
+    pub no_vsync: bool,
 }
 
 /// Set once by `main` before the GUI boots; read by `app::boot`.

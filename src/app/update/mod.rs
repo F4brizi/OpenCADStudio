@@ -7965,6 +7965,13 @@ impl OpenCADStudio {
             }
 
             #[cfg(not(target_arch = "wasm32"))]
+            Message::GraphicsVsyncToggled(on) => {
+                self.graphics_prefs.vsync = on;
+                crate::gpu_backend::save_prefs(self.graphics_prefs);
+                Task::none()
+            }
+
+            #[cfg(not(target_arch = "wasm32"))]
             Message::GraphicsLegacyGlToggled(on) => {
                 self.graphics_prefs.legacy_gl = on;
                 crate::gpu_backend::save_prefs(self.graphics_prefs);

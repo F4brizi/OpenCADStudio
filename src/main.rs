@@ -101,6 +101,18 @@ fn main() -> iced::Result {
             let _ = env_logger::try_init();
         }
 
+        // Latency tuning: disable V-Sync at the driver and compositor levels when requested
+        // either via CLI (--no-vsync) or persisted in ~/.config/OpenCADStudio/graphics.json.
+        // We set `vblank_mode=0` for Mesa OpenGL. For wgpu/iced, `vsync: false`
+        // uses `AutoNoVsync`, which negotiates Immediate/Mailbox when supported,
+        // and safely falls back to Fifo on drivers reporting only [Fifo] without panicking.
+        let saved_gpu_prefs = OpenCADStudio::gpu_backend::load_prefs();
+        let vsync_disabled = args.no_vsync || !saved_gpu_prefs.vsync;
+        if vsync_disabled {
+            std::env::remove_var("ICED_PRESENT_MODE");
+            std::env::set_var("vblank_mode", "0");
+        }
+
         // GPU backend selection. Explicit `--backend` wins; `--safe-mode`
         // forces GL for flaky drivers. On Windows the preference order starts
         // with DX12/Vulkan so the AMD OpenGL ICD (atio6axx.dll) is never
@@ -205,6 +217,7 @@ fn main() -> iced::Result {
             script_lines,
             gpu_fallback_notice,
             gpu_compat_auto,
+            no_vsync: vsync_disabled,
         });
 
         // Register (or refresh) the freedesktop DWG thumbnailer so file managers

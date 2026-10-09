@@ -152,6 +152,8 @@ pub struct GraphicsPrefs {
     pub legacy_gl: bool,
     /// MSAA sample count (0 = auto, 1 = disabled, 4 = 4x MSAA).
     pub msaa: u32,
+    /// Vertical synchronization (V-Sync) presentation mode.
+    pub vsync: bool,
 }
 
 impl Default for GraphicsPrefs {
@@ -161,6 +163,7 @@ impl Default for GraphicsPrefs {
             compat_renderer: false,
             legacy_gl: true,
             msaa: 0,
+            vsync: true,
         }
     }
 }
@@ -199,6 +202,10 @@ pub fn load_prefs() -> GraphicsPrefs {
             .and_then(|x| x.as_u64())
             .map(|x| x as u32)
             .unwrap_or(d.msaa),
+        vsync: v
+            .get("vsync")
+            .and_then(|x| x.as_bool())
+            .unwrap_or(d.vsync),
     }
 }
 
@@ -215,6 +222,7 @@ pub fn save_prefs(prefs: GraphicsPrefs) {
         "compat_renderer": prefs.compat_renderer,
         "legacy_gl": prefs.legacy_gl,
         "msaa": prefs.msaa,
+        "vsync": prefs.vsync,
     });
     let _ = std::fs::write(p, serde_json::to_string_pretty(&json).unwrap_or_default());
 }

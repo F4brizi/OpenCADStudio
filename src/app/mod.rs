@@ -2280,6 +2280,8 @@ pub enum Message {
     GraphicsCompatToggled(bool),
     /// Options > Graphics: prefer OpenGL on older GPUs.
     #[cfg(not(target_arch = "wasm32"))]
+    GraphicsVsyncToggled(bool),
+    #[cfg(not(target_arch = "wasm32"))]
     GraphicsLegacyGlToggled(bool),
     /// Set CURSORSIZE from the Display-page slider.
     CursorSizeChanged(i32),
@@ -4883,6 +4885,7 @@ use std::path::PathBuf;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn run() -> iced::Result {
+    let cfg = crate::cli::gui_config();
     iced::daemon(
         OpenCADStudio::boot,
         OpenCADStudio::update,
@@ -4890,6 +4893,7 @@ pub fn run() -> iced::Result {
     )
     .settings(iced::Settings {
         power_preference: iced::backend::PowerPreference::HighPerformance,
+        vsync: !cfg.no_vsync,
         ..iced::Settings::default()
     })
     .subscription(OpenCADStudio::subscription)
