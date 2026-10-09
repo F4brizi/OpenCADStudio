@@ -73,12 +73,12 @@ where
                     Some(last) => now.duration_since(last).as_millis() > 30, // ~30 fps tick
                     None => true,
                 };
+                
                 if emit {
                     shell.publish(Message::ViewportMove(*position));
                     state.last_move = Some(now);
-                } else {
-                    shell.request_redraw();
                 }
+
                 shell.capture_event();
             }
             Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Left)) => {
