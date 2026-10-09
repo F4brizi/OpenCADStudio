@@ -1,21 +1,25 @@
 use iced::advanced::{layout, mouse, renderer, widget::Tree, Layout, Widget};
-use iced::{Element, Event, Length, Rectangle, Size};
+use iced::{Element, Event, Length, Point, Rectangle, Size};
 use crate::app::Message;
-
+use std::sync::Arc;
+use std::cell::RefCell;
+use crate::scene::SelectionState;
 
 #[derive(Default)]
 pub struct ViewportInputState {
-    pub last_move: Option<std::time::Instant>,
+    last_move: Option<std::time::Instant>,
 }
 
 pub struct ViewportInput<'a> {
-    _marker: std::marker::PhantomData<&'a ()>,
+    pub last_cursor_screen: &'a std::cell::Cell<Point>,
+    pub selection: Arc<RefCell<SelectionState>>,
 }
 
 impl<'a> ViewportInput<'a> {
-    pub fn new() -> Self {
+    pub fn new(last_cursor_screen: &'a std::cell::Cell<Point>, selection: Arc<RefCell<SelectionState>>) -> Self {
         Self {
-            _marker: std::marker::PhantomData,
+            last_cursor_screen,
+            selection,
         }
     }
 }
@@ -62,10 +66,6 @@ where
         }
         let state = tree.state.downcast_mut::<ViewportInputState>();
 
-        if !cursor.is_over(*bounds) {
-            return;
-        }
-
         match event {
             Event::Mouse(mouse::Event::CursorMoved { position }) => {
                 let now = std::time::Instant::now();
@@ -74,56 +74,72 @@ where
                     None => true,
                 };
                 
+                self.last_cursor_screen.set(*position);
+                self.selection.borrow_mut().last_move_pos = Some(*position);
+                shell.request_redraw();
+
                 if emit {
                     shell.publish(Message::ViewportMove(*position));
                     state.last_move = Some(now);
                 }
 
-                shell.capture_event();
+                shell.capture_event()
             }
             Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Left)) => {
-                if let Some(pos) = cursor.position() {
+                if let Some(_pos) = cursor.position() {
                     shell.publish(Message::ViewportLeftPress);
-                    shell.capture_event();
+                    shell.capture_event()
+                } else {
+                    
                 }
             }
             Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Left)) => {
-                if let Some(pos) = cursor.position() {
+                if let Some(_pos) = cursor.position() {
                     shell.publish(Message::ViewportLeftRelease);
-                    shell.capture_event();
+                    shell.capture_event()
+                } else {
+                    
                 }
             }
             Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Right)) => {
-                if let Some(pos) = cursor.position() {
+                if let Some(_pos) = cursor.position() {
                     shell.publish(Message::ViewportRightPress);
-                    shell.capture_event();
+                    shell.capture_event()
+                } else {
+                    
                 }
             }
             Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Right)) => {
-                if let Some(pos) = cursor.position() {
+                if let Some(_pos) = cursor.position() {
                     shell.publish(Message::ViewportRightRelease);
-                    shell.capture_event();
+                    shell.capture_event()
+                } else {
+                    
                 }
             }
             Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Middle)) => {
-                if let Some(pos) = cursor.position() {
+                if let Some(_pos) = cursor.position() {
                     shell.publish(Message::ViewportMiddlePress);
-                    shell.capture_event();
+                    shell.capture_event()
+                } else {
+                    
                 }
             }
             Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Middle)) => {
-                if let Some(pos) = cursor.position() {
+                if let Some(_pos) = cursor.position() {
                     shell.publish(Message::ViewportMiddleRelease);
-                    shell.capture_event();
+                    shell.capture_event()
+                } else {
+                    
                 }
             }
             Event::Mouse(mouse::Event::WheelScrolled { delta }) => {
                 shell.publish(Message::ViewportScroll(*delta));
-                shell.capture_event();
+                shell.capture_event()
             }
             Event::Mouse(mouse::Event::CursorLeft) => {
                 shell.publish(Message::ViewportExit);
-                shell.capture_event();
+                shell.capture_event()
             }
             _ => {}
         }

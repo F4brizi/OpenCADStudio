@@ -48,8 +48,8 @@ pub(crate) fn tooltip_style(theme: &Theme) -> container::Style {
 
 pub struct Ribbon {
     modules: Vec<Box<dyn CadModule>>,
-    active: usize,
-    active_tool: Option<String>,
+    pub active: usize,
+    pub active_tool: Option<String>,
     pub wireframe: bool,
     pub ortho_mode: bool,
     /// ViewCube (NAVVCUBE) visibility — drives the View Cube button highlight.
