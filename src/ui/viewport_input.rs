@@ -57,13 +57,13 @@ where
         &mut self,
         tree: &mut Tree,
         event: &Event,
-        _layout: Layout<'_>,
+        layout: Layout<'_>,
         cursor: mouse::Cursor,
         _renderer: &Renderer,
         shell: &mut iced::advanced::Shell<'_, Message>,
-        bounds: &Rectangle,
+        _bounds: &Rectangle,
     ) {
-        if !cursor.is_over(*bounds) {
+        if !cursor.is_over(layout.bounds()) {
             return;
         }
         let state = tree.state.downcast_mut::<ViewportInputState>();
@@ -89,7 +89,8 @@ where
                         shell.request_redraw();
                     }
                     
-                    let local = iced::Point::new(position.x - bounds.x, position.y - bounds.y);
+                    let b = layout.bounds();
+                    let local = iced::Point::new(position.x - b.x, position.y - b.y);
                     if let Some(idx) = self.pane_idx {
                         shell.publish(Message::PaneMove(idx, local));
                     } else {
