@@ -391,7 +391,7 @@ impl OpenCADStudio {
                 let scene = &tab.scene;
                 Some(
                     pane_grid::PaneGrid::new(&scene.model_panes, |_pane, &idx, _maximized| {
-                        pane_grid::Content::new(pane_mouse_area(idx))
+                        pane_grid::Content::new(pane_mouse_area(idx, &tab.last_cursor_screen, tab.scene.selection.clone(), self.graphics_prefs.compat_renderer || crate::gpu_backend::active_gpu().backend.as_deref() == Some("gl")))
                     })
                     .width(Fill)
                     .height(Fill)
@@ -954,7 +954,7 @@ bg={bg_ms:.1}ms n={view_count}"
         };
 
         mark("viewport_mouse");
-        let viewport_mouse = crate::ui::viewport_input::ViewportInput::new(&tab.last_cursor_screen, tab.scene.selection.clone(), self.graphics_prefs.compat_renderer || crate::gpu_backend::active_gpu().backend.as_deref() == Some("gl"));
+        let viewport_mouse = crate::ui::viewport_input::ViewportInput::new(&tab.last_cursor_screen, tab.scene.selection.clone(), self.graphics_prefs.compat_renderer || crate::gpu_backend::active_gpu().backend.as_deref() == Some("gl"), None);
 
         let desk_bg = self.model_space.resolve_desk_bg();
         let desk_color = Color {
@@ -3380,18 +3380,19 @@ fn start_primary_style(theme: &Theme) -> iced::widget::text::Style {
 /// Transparent input layer for one Model pane: a `mouse_area` filling the pane
 /// that emits pane-tagged viewport events (`idx` = the pane's tile index). The
 /// handlers offset the pane-local point to canvas coords and focus the pane.
-fn pane_mouse_area<'a>(idx: usize) -> Element<'a, Message> {
-    mouse_area(container(Space::new().width(Fill).height(Fill)))
-        .on_move(move |p| Message::PaneMove(idx, p))
-        .on_press(Message::PanePress(idx))
-        .on_release(Message::PaneRelease(idx))
-        .on_right_press(Message::PaneRightPress(idx))
-        .on_right_release(Message::PaneRightRelease(idx))
-        .on_middle_press(Message::PaneMiddlePress(idx))
-        .on_middle_release(Message::PaneMiddleRelease(idx))
-        .on_scroll(move |d| Message::PaneScroll(idx, d))
-        .on_exit(Message::ViewportExit)
-        .into()
+fn pane_mouse_area<'a>(
+    idx: usize,
+    last_cursor_screen: &'a std::cell::Cell<iced::Point>,
+    selection: std::sync::Arc<std::cell::RefCell<crate::scene::SelectionState>>,
+    hardware_cursor: bool,
+) -> Element<'a, Message> {
+    crate::ui::viewport_input::ViewportInput::new(
+        last_cursor_screen,
+        selection,
+        hardware_cursor,
+        Some(idx),
+    )
+    .into()
 }
 
 /// Canvas that draws a label rotated 90° (for a collapsed panel's bar).

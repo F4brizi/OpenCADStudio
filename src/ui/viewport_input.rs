@@ -14,14 +14,16 @@ pub struct ViewportInput<'a> {
     pub last_cursor_screen: &'a std::cell::Cell<Point>,
     pub selection: Arc<RefCell<SelectionState>>,
     pub hardware_cursor: bool,
+    pub pane_idx: Option<usize>,
 }
 
 impl<'a> ViewportInput<'a> {
-    pub fn new(last_cursor_screen: &'a std::cell::Cell<Point>, selection: Arc<RefCell<SelectionState>>, hardware_cursor: bool) -> Self {
+    pub fn new(last_cursor_screen: &'a std::cell::Cell<Point>, selection: Arc<RefCell<SelectionState>>, hardware_cursor: bool, pane_idx: Option<usize>) -> Self {
         Self {
             last_cursor_screen,
             selection,
             hardware_cursor,
+            pane_idx,
         }
     }
 }
@@ -87,7 +89,11 @@ where
                     if self.hardware_cursor {
                         shell.request_redraw();
                     }
-                    shell.publish(Message::ViewportMove(*position));
+                    if let Some(idx) = self.pane_idx {
+                        shell.publish(Message::PaneMove(idx, *position));
+                    } else {
+                        shell.publish(Message::ViewportMove(*position));
+                    }
                     state.last_move = Some(now);
                 }
 
@@ -95,7 +101,7 @@ where
             }
             Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Left)) => {
                 if let Some(_pos) = cursor.position() {
-                    shell.publish(Message::ViewportLeftPress);
+                    if let Some(idx) = self.pane_idx { shell.publish(Message::PanePress(idx)); } else { shell.publish(Message::ViewportLeftPress); }
                     shell.capture_event()
                 } else {
                     
@@ -103,7 +109,7 @@ where
             }
             Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Left)) => {
                 if let Some(_pos) = cursor.position() {
-                    shell.publish(Message::ViewportLeftRelease);
+                    if let Some(idx) = self.pane_idx { shell.publish(Message::PaneRelease(idx)); } else { shell.publish(Message::ViewportLeftRelease); }
                     shell.capture_event()
                 } else {
                     
@@ -111,7 +117,7 @@ where
             }
             Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Right)) => {
                 if let Some(_pos) = cursor.position() {
-                    shell.publish(Message::ViewportRightPress);
+                    if let Some(idx) = self.pane_idx { shell.publish(Message::PaneRightPress(idx)); } else { shell.publish(Message::ViewportRightPress); }
                     shell.capture_event()
                 } else {
                     
@@ -119,7 +125,7 @@ where
             }
             Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Right)) => {
                 if let Some(_pos) = cursor.position() {
-                    shell.publish(Message::ViewportRightRelease);
+                    if let Some(idx) = self.pane_idx { shell.publish(Message::PaneRightRelease(idx)); } else { shell.publish(Message::ViewportRightRelease); }
                     shell.capture_event()
                 } else {
                     
@@ -127,7 +133,7 @@ where
             }
             Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Middle)) => {
                 if let Some(_pos) = cursor.position() {
-                    shell.publish(Message::ViewportMiddlePress);
+                    if let Some(idx) = self.pane_idx { shell.publish(Message::PaneMiddlePress(idx)); } else { shell.publish(Message::ViewportMiddlePress); }
                     shell.capture_event()
                 } else {
                     
@@ -135,14 +141,14 @@ where
             }
             Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Middle)) => {
                 if let Some(_pos) = cursor.position() {
-                    shell.publish(Message::ViewportMiddleRelease);
+                    if let Some(idx) = self.pane_idx { shell.publish(Message::PaneMiddleRelease(idx)); } else { shell.publish(Message::ViewportMiddleRelease); }
                     shell.capture_event()
                 } else {
                     
                 }
             }
             Event::Mouse(mouse::Event::WheelScrolled { delta }) => {
-                shell.publish(Message::ViewportScroll(*delta));
+                if let Some(idx) = self.pane_idx { shell.publish(Message::PaneScroll(idx, *delta)); } else { shell.publish(Message::ViewportScroll(*delta)); }
                 shell.capture_event()
             }
             Event::Mouse(mouse::Event::CursorLeft) => {
