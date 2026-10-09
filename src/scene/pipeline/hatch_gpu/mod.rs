@@ -118,7 +118,7 @@ impl HatchGpu {
                 },
             }),
             multisample: wgpu::MultisampleState {
-                count: super::MSAA_SAMPLES,
+                count: super::msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },

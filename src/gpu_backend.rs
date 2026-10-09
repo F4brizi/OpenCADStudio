@@ -150,6 +150,8 @@ pub struct GraphicsPrefs {
     pub compat_renderer: bool,
     /// On Windows, prefer OpenGL when the GPU is below the WebGPU baseline.
     pub legacy_gl: bool,
+    /// MSAA sample count (0 = auto, 1 = disabled, 4 = 4x MSAA).
+    pub msaa: u32,
 }
 
 impl Default for GraphicsPrefs {
@@ -158,6 +160,7 @@ impl Default for GraphicsPrefs {
             backend: BackendChoice::Auto,
             compat_renderer: false,
             legacy_gl: true,
+            msaa: 0,
         }
     }
 }
@@ -191,6 +194,11 @@ pub fn load_prefs() -> GraphicsPrefs {
             .get("legacy_gl")
             .and_then(|x| x.as_bool())
             .unwrap_or(d.legacy_gl),
+        msaa: v
+            .get("msaa")
+            .and_then(|x| x.as_u64())
+            .map(|x| x as u32)
+            .unwrap_or(d.msaa),
     }
 }
 
@@ -206,6 +214,7 @@ pub fn save_prefs(prefs: GraphicsPrefs) {
         "backend": prefs.backend.as_str().unwrap_or("auto"),
         "compat_renderer": prefs.compat_renderer,
         "legacy_gl": prefs.legacy_gl,
+        "msaa": prefs.msaa,
     });
     let _ = std::fs::write(p, serde_json::to_string_pretty(&json).unwrap_or_default());
 }

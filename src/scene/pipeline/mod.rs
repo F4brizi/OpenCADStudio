@@ -76,7 +76,19 @@ struct SilhouetteSourceGroup {
 use device_capabilities::DeviceCapabilities;
 
 /// MSAA sample count for the main drawing pipelines.
-const MSAA_SAMPLES: u32 = 4;
+pub(crate) fn msaa_samples() -> u32 {
+    let prefs = crate::gpu_backend::load_prefs();
+    if prefs.msaa > 0 {
+        return prefs.msaa;
+    }
+    let status = gpu_status();
+    if prefs.compat_renderer || status.identity().is_some_and(|id| id.contains("BYT") || id.contains("llvmpipe")) {
+        1
+    } else {
+        4
+    }
+}
+
 const SHADOW_MAP_SIZE: u32 = 2048;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -711,7 +723,7 @@ impl Pipeline {
                 bias: wgpu::DepthBiasState::default(),
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -751,7 +763,7 @@ impl Pipeline {
                 bias: wgpu::DepthBiasState::default(),
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -830,7 +842,7 @@ impl Pipeline {
                 bias: wgpu::DepthBiasState::default(),
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -872,7 +884,7 @@ impl Pipeline {
                 bias: wgpu::DepthBiasState::default(),
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -915,7 +927,7 @@ impl Pipeline {
                 bias: wgpu::DepthBiasState::default(),
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -971,7 +983,7 @@ impl Pipeline {
                     bias: wgpu::DepthBiasState::default(),
                 }),
                 multisample: wgpu::MultisampleState {
-                    count: MSAA_SAMPLES,
+                    count: msaa_samples(),
                     mask: !0,
                     alpha_to_coverage_enabled: false,
                 },
@@ -1078,7 +1090,7 @@ impl Pipeline {
                 bias: wgpu::DepthBiasState::default(),
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -1391,7 +1403,7 @@ impl Pipeline {
                 },
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -1438,7 +1450,7 @@ impl Pipeline {
                     },
                 }),
                 multisample: wgpu::MultisampleState {
-                    count: MSAA_SAMPLES,
+                    count: msaa_samples(),
                     mask: !0,
                     alpha_to_coverage_enabled: false,
                 },
@@ -1490,7 +1502,7 @@ impl Pipeline {
                     },
                 }),
                 multisample: wgpu::MultisampleState {
-                    count: MSAA_SAMPLES,
+                    count: msaa_samples(),
                     mask: !0,
                     alpha_to_coverage_enabled: false,
                 },
@@ -1537,7 +1549,7 @@ impl Pipeline {
                     },
                 }),
                 multisample: wgpu::MultisampleState {
-                    count: MSAA_SAMPLES,
+                    count: msaa_samples(),
                     mask: !0,
                     alpha_to_coverage_enabled: false,
                 },
@@ -1587,7 +1599,7 @@ impl Pipeline {
                         bias: wgpu::DepthBiasState::default(),
                     }),
                     multisample: wgpu::MultisampleState {
-                        count: MSAA_SAMPLES,
+                        count: msaa_samples(),
                         mask: !0,
                         alpha_to_coverage_enabled: false,
                     },
@@ -1664,7 +1676,7 @@ impl Pipeline {
                     bias: wgpu::DepthBiasState::default(),
                 }),
                 multisample: wgpu::MultisampleState {
-                    count: MSAA_SAMPLES,
+                    count: msaa_samples(),
                     mask: !0,
                     alpha_to_coverage_enabled: false,
                 },
@@ -1730,7 +1742,7 @@ impl Pipeline {
                     bias: wgpu::DepthBiasState::default(),
                 }),
                 multisample: wgpu::MultisampleState {
-                    count: MSAA_SAMPLES,
+                    count: msaa_samples(),
                     mask: !0,
                     alpha_to_coverage_enabled: false,
                 },
@@ -1786,7 +1798,7 @@ impl Pipeline {
                 },
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -1833,7 +1845,7 @@ impl Pipeline {
                     },
                 }),
                 multisample: wgpu::MultisampleState {
-                    count: MSAA_SAMPLES,
+                    count: msaa_samples(),
                     mask: !0,
                     alpha_to_coverage_enabled: false,
                 },
@@ -1897,7 +1909,7 @@ impl Pipeline {
                 },
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -1944,7 +1956,7 @@ impl Pipeline {
                 },
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -1994,7 +2006,7 @@ impl Pipeline {
                     },
                 }),
                 multisample: wgpu::MultisampleState {
-                    count: MSAA_SAMPLES,
+                    count: msaa_samples(),
                     mask: !0,
                     alpha_to_coverage_enabled: false,
                 },
@@ -2096,7 +2108,7 @@ impl Pipeline {
                 bias: wgpu::DepthBiasState::default(),
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -2150,7 +2162,7 @@ impl Pipeline {
                 bias: wgpu::DepthBiasState::default(),
             }),
             multisample: wgpu::MultisampleState {
-                count: MSAA_SAMPLES,
+                count: msaa_samples(),
                 mask: !0,
                 alpha_to_coverage_enabled: false,
             },
@@ -2182,7 +2194,7 @@ impl Pipeline {
                 &frame_bgl,
                 &text_atlas_bgl,
                 format,
-                MSAA_SAMPLES,
+                msaa_samples(),
                 &content_stencil,
             );
 
@@ -2190,7 +2202,7 @@ impl Pipeline {
             device,
             &frame_bgl,
             format,
-            MSAA_SAMPLES,
+            msaa_samples(),
             &content_stencil,
         );
 
@@ -2198,7 +2210,7 @@ impl Pipeline {
             device,
             &frame_bgl,
             format,
-            MSAA_SAMPLES,
+            msaa_samples(),
             &content_stencil,
         );
 
@@ -5427,7 +5439,8 @@ impl Pipeline {
     fn gpu_live_bytes(&self) -> GpuLiveBytes {
         // 4x MSAA colour (4 B/sample) + 4x MSAA depth-stencil (4 B/sample) +
         // one single-sample resolve target.
-        const BYTES_PER_PIXEL: u64 = (MSAA_SAMPLES as u64) * 4 + (MSAA_SAMPLES as u64) * 4 + 4;
+        let msaa = msaa_samples() as u64;
+        let bytes_per_pixel = msaa * 4 + msaa * 4 + 4;
         let pixels = u64::from(self.alloc_size.width) * u64::from(self.alloc_size.height);
         GpuLiveBytes {
             slots: 1,
@@ -5437,7 +5450,7 @@ impl Pipeline {
                 Some(_) => u64::from(SHADOW_MAP_SIZE) * u64::from(SHADOW_MAP_SIZE) * 4,
                 None => 4,
             },
-            render_targets: pixels * BYTES_PER_PIXEL,
+            render_targets: pixels * bytes_per_pixel,
             text_atlas: self
                 .text_atlas_gpu
                 .as_ref()
@@ -5570,7 +5583,7 @@ fn create_depth_texture(device: &wgpu::Device, size: Size<u32>) -> wgpu::Texture
             depth_or_array_layers: 1,
         },
         mip_level_count: 1,
-        sample_count: MSAA_SAMPLES,
+        sample_count: msaa_samples(),
         dimension: wgpu::TextureDimension::D2,
         format: wgpu::TextureFormat::Depth24PlusStencil8,
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -5612,7 +5625,7 @@ fn create_msaa_texture(
             depth_or_array_layers: 1,
         },
         mip_level_count: 1,
-        sample_count: MSAA_SAMPLES,
+        sample_count: msaa_samples(),
         dimension: wgpu::TextureDimension::D2,
         format,
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
