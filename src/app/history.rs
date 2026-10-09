@@ -1117,7 +1117,7 @@ impl OpenCADStudio {
         // before drawing the icon/grid or accepting the next coordinate.
         self.tabs[i].refresh_active_ucs();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set(None);
         self.tabs[i].active_grip = None;
         if layer_panel_changed {
             let doc_layers = self.tabs[i].scene.document.layers.clone();

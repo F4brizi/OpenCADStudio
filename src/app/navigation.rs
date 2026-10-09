@@ -142,7 +142,7 @@ impl OpenCADStudio {
                 aspect,
                 model_bounds: [min.x, min.y, min.z, max.x, max.y, max.z],
                 selection_bounds,
-                pointer: tab.last_cursor_world,
+                pointer: tab.last_cursor_world.get(),
                 pivot,
                 pivot_visible: self.spacemouse_pivot.is_some(),
                 rotate: self
@@ -428,12 +428,12 @@ mod tests {
         let _ = app.feed_command(crate::command::StepInput::Point(DVec3::ZERO));
         let _ = app.on_viewport_move(iced::Point::new(480., 300.));
         let i = app.active_tab;
-        let before = app.tabs[i].last_cursor_world;
+        let before = app.tabs[i].last_cursor_world.get();
         let count = app.tabs[i].scene.document.entities().count();
         app.sync_spacemouse();
         app.spacemouse.test_propose(|v| v.eye.x += 3.);
         let _ = app.on_spacemouse_wake();
-        assert!((app.tabs[i].last_cursor_world.x - before.x - 3.).abs() < 1e-4);
+        assert!((app.tabs[i].last_cursor_world.get().x - before.x - 3.).abs() < 1e-4);
         assert!(app.tabs[i].active_cmd.is_some());
         assert_eq!(app.tabs[i].scene.document.entities().count(), count);
     }

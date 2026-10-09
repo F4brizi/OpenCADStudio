@@ -507,7 +507,7 @@ pub(super) fn on_tab_close(&mut self, idx: usize) -> Task<Message> {
 
                             let target = if matches!(grip.mode, GripEditMode::RectangleResize) {
                                 grip.rectangle_frame.map(|(opposite, width_axis, height_axis)| {
-                                    let cursor_delta = self.tabs[i].last_cursor_world - opposite;
+                                    let cursor_delta = self.tabs[i].last_cursor_world.get() - opposite;
                                     let mut width = cursor_delta.dot(width_axis);
                                     let mut height = cursor_delta.dot(height_axis);
                                     for field in &self.tabs[i].dyn_fields {
@@ -544,7 +544,7 @@ pub(super) fn on_tab_close(&mut self, idx: usize) -> Task<Message> {
                                 );
 
                                 crate::app::expr_eval::eval_number(text.trim()).map(|dist| {
-                                    let cursor = self.tabs[i].last_cursor_world;
+                                    let cursor = self.tabs[i].last_cursor_world.get();
 
                                     // If the cursor is following OTRACK or Extension,
                                     // preserve the existing reference-ray behaviour.
@@ -665,7 +665,7 @@ pub(super) fn on_tab_close(&mut self, idx: usize) -> Task<Message> {
                                     }
                                 }
 
-                                self.tabs[i].last_cursor_world = target;
+                                self.tabs[i].last_cursor_world.set(target);
                                 self.command_line.input.clear();
 
                                 // Consume the typed Dynamic Input values.
@@ -986,7 +986,7 @@ pub(super) fn on_tab_close(&mut self, idx: usize) -> Task<Message> {
                 .and_then(|c| c.resolved_anchor())
                 .or(self.tabs[i].dyn_anchor)
                 .or(self.last_point)?;
-            let w = self.tabs[i].last_cursor_world;
+            let w = self.tabs[i].last_cursor_world.get();
             let xf = self.tabs[i].ucs_xform();
             let d_ucs = xf.vec_to_ucs(w - anchor);
             let dx = d_ucs.x;
@@ -1161,7 +1161,7 @@ pub(super) fn on_tab_close(&mut self, idx: usize) -> Task<Message> {
                     }
                     self.ucs_icon_selected = false;
                     self.ucs_icon_hover = false;
-                    self.tabs[i].snap_result = None;
+                    self.tabs[i].snap_result.set(None);
                     return Task::none();
                 }
                 // Leave an interactive navigation mode and end its in-flight

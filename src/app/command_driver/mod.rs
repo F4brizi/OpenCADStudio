@@ -120,7 +120,7 @@ impl OpenCADStudio {
                 result = next_res;
             } else {
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.restore_pre_cmd_tangent();
                 return Task::none();
             }
@@ -605,14 +605,14 @@ impl OpenCADStudio {
             CmdResult::XClip { inserts, action } => {
                 self.tabs[i].scene.clear_preview_wire();
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.apply_xclip(i, inserts, action);
             }
             CmdResult::OpenPdfImportSettings => self.open_pdf_import_settings(),
             CmdResult::PdfImportFile(import) => {
                 self.tabs[i].scene.clear_preview_wire();
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.run_pdf_import(
                     i,
                     crate::app::commands::pdf_import::PdfImportSource::File(import),
@@ -622,7 +622,7 @@ impl OpenCADStudio {
                 let label = self.history_label_from_active_cmd(i, "POINTCLOUDATTACH");
                 self.tabs[i].scene.clear_preview_wire();
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.command_line.push_output(&message);
                 self.attach_point_cloud(i, label, placement);
                 self.restore_pre_cmd_tangent();
@@ -631,14 +631,14 @@ impl OpenCADStudio {
                 let label = self.history_label_from_active_cmd(i, "PDFATTACH");
                 self.tabs[i].scene.clear_preview_wire();
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.attach_pdf_pages(i, label, kind, &path, pages);
                 self.restore_pre_cmd_tangent();
             }
             CmdResult::PdfImport(request) => {
                 self.tabs[i].scene.clear_preview_wire();
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.run_pdf_import(
                     i,
                     crate::app::commands::pdf_import::PdfImportSource::Underlay(request),
@@ -1118,7 +1118,7 @@ impl OpenCADStudio {
         } else {
             self.tabs[i].suspended_cmd = None;
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.restore_pre_cmd_tangent();
             self.command_line.push_info(
                 crate::t!(if space_changed {
@@ -1211,7 +1211,7 @@ impl OpenCADStudio {
             self.tabs[i].scene.select_entity(*h, false);
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.dispatch_command(&cmd)
@@ -1236,7 +1236,7 @@ impl OpenCADStudio {
             }
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.dispatch_command(&cmd)
@@ -1245,7 +1245,7 @@ impl OpenCADStudio {
     fn handle_measurement(&mut self, msg: String) {
         let i = self.active_tab;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.command_line.push_output(&msg);
@@ -1253,7 +1253,7 @@ impl OpenCADStudio {
 
     fn handle_report_measurement(&mut self, msg: String) {
         let i = self.active_tab;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.refresh_area_preview(i);
         self.command_line.push_output(&msg);
@@ -1264,7 +1264,7 @@ impl OpenCADStudio {
 
     fn handle_report_error(&mut self, msg: String) {
         let i = self.active_tab;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.command_line.push_error(&msg);
         if let Some(prompt) = self.tabs[i].active_cmd.as_ref().map(|c| c.prompt()) {
@@ -1274,7 +1274,7 @@ impl OpenCADStudio {
 
     fn handle_report_measurement_and_deselect(&mut self, msg: String) {
         let i = self.active_tab;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.deselect_all();
         self.tabs[i].scene.clear_preview_wire();
         self.refresh_area_preview(i);
@@ -1287,7 +1287,7 @@ impl OpenCADStudio {
 
     fn handle_deselect_and_continue(&mut self) {
         let i = self.active_tab;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.deselect_all();
         self.tabs[i].scene.clear_preview_wire();
         self.refresh_area_preview(i);
@@ -1329,7 +1329,7 @@ impl OpenCADStudio {
     fn handle_return_point(&mut self) {
         let i = self.active_tab;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
     }
@@ -1343,7 +1343,7 @@ impl OpenCADStudio {
         let i = self.active_tab;
         handles.retain(|handle| !self.tabs[i].scene.is_layer_locked(*handle));
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         if handles.is_empty() {
             return Some(Task::none());
@@ -1361,7 +1361,7 @@ impl OpenCADStudio {
         let i = self.active_tab;
         handles.retain(|handle| !self.tabs[i].scene.is_layer_locked(*handle));
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         if handles.is_empty() {
             return Some(Task::none());
@@ -1391,7 +1391,7 @@ impl OpenCADStudio {
         // re-prompts until a valid table cell is selected.
         use crate::modules::annotate::table_cmd::{table_cell_at, TableCellEditStart};
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
 
@@ -1476,7 +1476,7 @@ impl OpenCADStudio {
         }
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
     }
 
@@ -1493,7 +1493,7 @@ impl OpenCADStudio {
         }
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
     }
     // --- C2a handlers: property_match (thin-router targets, bodies moved verbatim) ---

@@ -36,7 +36,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         if let Some(pending) = pending {
             self.commit_undo_delta(i, pending);
@@ -57,7 +57,7 @@ impl OpenCADStudio {
         let i = self.active_tab;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         let Some(codec::EntityType::Viewport(vp)) = self.tabs[i].scene.document.get_entity(viewport).cloned()
         else {
             return;
@@ -255,7 +255,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         if let Some(pending) = pending {
             self.commit_undo_delta(i, pending);
@@ -313,7 +313,7 @@ impl OpenCADStudio {
         let i = self.active_tab;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         self.on_layout_switch(layout)
     }
@@ -424,7 +424,7 @@ impl OpenCADStudio {
     pub(in crate::app) fn handle_zoom_to_window(&mut self, p1: glam::DVec3, p2: glam::DVec3) {
         let i = self.active_tab;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].scene.remember_current_view();
         self.tabs[i]
@@ -475,7 +475,7 @@ impl OpenCADStudio {
             self.active_modal = Some(super::super::ModalKind::Plot);
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
     }
@@ -483,7 +483,7 @@ impl OpenCADStudio {
     pub(super) fn handle_quick_print(&mut self, handles: Vec<Handle>) -> Task<Message> {
         let i = self.active_tab;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.on_quick_print_handles(handles)

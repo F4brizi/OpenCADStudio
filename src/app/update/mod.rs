@@ -4757,7 +4757,7 @@ impl OpenCADStudio {
             Message::ToggleQuickProperties => {
                 self.quick_properties ^= true;
                 if self.quick_properties {
-                    self.quick_properties_anchor = self.tabs[self.active_tab].last_cursor_screen;
+                    self.quick_properties_anchor = self.tabs[self.active_tab].last_cursor_screen.get();
                 }
                 self.save_config();
                 Task::none()
@@ -5917,7 +5917,7 @@ impl OpenCADStudio {
                 // without waiting for the next mouse move.
                 let i = self.active_tab;
                 if ctrl_changed && self.tabs[i].active_cmd.is_some() {
-                    let p = self.tabs[i].last_cursor_screen;
+                    let p = self.tabs[i].last_cursor_screen.get();
                     return Task::done(Message::ViewportMove(p));
                 }
                 Task::none()

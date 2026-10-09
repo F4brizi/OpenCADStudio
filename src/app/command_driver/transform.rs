@@ -25,7 +25,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         self.refresh_properties();
         if let Some(p) = pending {
@@ -78,7 +78,7 @@ impl OpenCADStudio {
         handles.retain(|handle| !self.tabs[i].scene.is_layer_locked(*handle));
         if handles.is_empty() {
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.tabs[i].scene.clear_preview_wire();
             self.restore_pre_cmd_tangent();
         } else {
@@ -125,7 +125,7 @@ impl OpenCADStudio {
             }
             self.tabs[i].scene.clear_preview_wire();
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.restore_pre_cmd_tangent();
             self.command_line
                 .push_output(crate::t!("ALIGN: applied.").as_ref());
@@ -563,7 +563,7 @@ impl OpenCADStudio {
         }
         self.tabs[i].dirty = true;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.command_line

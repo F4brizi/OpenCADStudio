@@ -286,7 +286,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set(None);
         self.restore_pre_cmd_tangent();
         if let Some(pending) = pending {
             self.commit_undo_delta(i, pending);

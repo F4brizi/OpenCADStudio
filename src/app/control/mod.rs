@@ -438,7 +438,7 @@ impl OpenCADStudio {
             "command":command,"modal":self.active_modal.as_ref().map(|m|format!("{m:?}")),
             "layout":tab.scene.current_layout,
             "ucs":tab.active_ucs.as_ref().map(|u|json!({"name":u.name,"origin":[u.origin.x,u.origin.y,u.origin.z],"x_axis":[u.x_axis.x,u.x_axis.y,u.x_axis.z],"y_axis":[u.y_axis.x,u.y_axis.y,u.y_axis.z],"elevation":u.elevation})),
-            "cursor":{"world":tab.last_cursor_world.to_array(),"screen":[tab.last_cursor_screen.x,tab.last_cursor_screen.y]},
+            "cursor":{"world":tab.last_cursor_world.get().to_array(),"screen":[tab.last_cursor_screen.get().x,tab.last_cursor_screen.get().y]},
             "viewport_size":({let s=tab.scene.selection.borrow();[s.vp_size.0,s.vp_size.1]}),
             "camera":({let c=tab.scene.camera.borrow();json!({"target":c.target.to_array(),"rotation":[c.rotation.x,c.rotation.y,c.rotation.z,c.rotation.w],"distance":c.distance,"fov_y":c.fov_y,"projection":format!("{:?}",c.projection),"yaw":c.yaw,"pitch":c.pitch})}),
             "mtext_editor":self.mtext_editor.as_ref().map(|e|json!({"text":e.content.text(),"height":e.height,"style":e.style})),
@@ -2114,7 +2114,7 @@ mod tests {
         assert_eq!(busy["code"], "busy", "{busy}");
         // The person clicks: the snapped world point under the cursor is the
         // answer, and the click leaves the selection untouched.
-        app.tabs[app.active_tab].last_cursor_world = glam::DVec3::new(125.5, 64.25, 0.0);
+        app.tabs[app.active_tab].last_cursor_world.set(glam::DVec3::new(125.5, 64.25, 0.0));
         let _ = app.update(Message::ViewportLeftPress);
         let done = user_select_result(&mut app, "gp-1");
         assert_eq!(done["status"], "completed", "{done}");
@@ -2175,10 +2175,10 @@ mod tests {
         )));
 
         assert!(
-            app.tabs[i].snap_result.is_some(),
+            app.tabs[i].snap_result.get().borrow().is_some(),
             "no object-snap marker while a getpoint is pending"
         );
-        let snapped = app.tabs[i].last_cursor_world;
+        let snapped = app.tabs[i].last_cursor_world.get();
         assert!(
             (snapped - endpoint).length() < 1e-6,
             "cursor point not snapped to the endpoint: {snapped:?}"
@@ -2232,7 +2232,7 @@ mod tests {
             sy as f32,
         )));
         assert!(
-            app.tabs[i].snap_result.is_some(),
+            app.tabs[i].snap_result.get().borrow().is_some(),
             "no object-snap marker while a user_select is pending"
         );
 

@@ -54,7 +54,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         let noun = if count == 1 { "copy" } else { "copies" };
         self.command_line
@@ -95,7 +95,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         if was_catchment {
             self.command_line
                 .push_info(crate::t!("Catchment tagged successfully.").as_ref());
@@ -126,7 +126,7 @@ impl OpenCADStudio {
         }
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         if let Some(prompt) = self.tabs[i]
             .active_cmd
             .as_ref()
@@ -222,7 +222,7 @@ impl OpenCADStudio {
     pub(super) fn handle_paste_clipboard(&mut self, base_pt: glam::DVec3) {
         let i = self.active_tab;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         if self.clipboard.is_empty() {
             self.command_line

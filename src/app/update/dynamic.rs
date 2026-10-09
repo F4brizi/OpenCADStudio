@@ -40,7 +40,7 @@ impl OpenCADStudio {
         // off that rather than searching the tracking set again — a second
         // search can disagree with the guide the user is looking at, and the
         // acquisition it needs may already have aged out of the set.
-        let snap = self.tabs[i].snap_result?;
+        let snap = self.tabs[i].snap_result.get()?;
         if snap.snap_type != crate::snap::SnapType::Extension {
             return None;
         }
@@ -344,7 +344,7 @@ impl OpenCADStudio {
         if fields.is_empty() {
             return None;
         }
-        let w = self.tabs[i].last_cursor_world;
+        let w = self.tabs[i].last_cursor_world.get();
         let base = self.tabs[i]
             .dyn_anchor
             .or(self.last_point)
@@ -621,7 +621,7 @@ impl OpenCADStudio {
             .dyn_anchor
             .or(self.last_point)
             .unwrap_or(glam::DVec3::ZERO);
-        let cur = self.tabs[i].last_cursor_world;
+        let cur = self.tabs[i].last_cursor_world.get();
         let a_cur = (cur.y - anchor.y).atan2(cur.x - anchor.x);
         let a_ref = self.tabs[i]
             .dyn_ref
@@ -784,10 +784,10 @@ impl OpenCADStudio {
         // feeding the already-resolved cursor back in is stable.
         if self.tabs[i].dyn_fields.iter().any(|f| f.buffer.is_some()) {
             if let Some(r) = self.dyn_resolve_point() {
-                self.tabs[i].last_cursor_world = r;
+                self.tabs[i].last_cursor_world.set(r);
             }
         }
-        let cur = self.tabs[i].last_cursor_world;
+        let cur = self.tabs[i].last_cursor_world.get();
         let previews = self.tabs[i]
             .active_cmd
             .as_mut()

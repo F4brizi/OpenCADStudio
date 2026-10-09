@@ -161,7 +161,7 @@ pub(super) struct DocumentTab {
     /// Most recently created path drawable. A fresh LINE/PLINE can accept its
     /// current final endpoint with Enter before the first click.
     pub(super) last_draw_anchor: Option<Handle>,
-    pub(super) snap_result: Option<SnapResult>,
+    pub(super) snap_result: std::cell::Cell<Option<SnapResult>>,
     pub(super) active_grip: Option<GripEdit>,
     pub(super) selected_grips: Vec<GripDef>,
     /// Entity handle for each entry in `selected_grips`.
@@ -180,8 +180,8 @@ pub(super) struct DocumentTab {
     pub(super) wireframe: bool,
     pub(super) render_mode: codec::entities::ViewportRenderMode,
     pub(super) visual_style: String,
-    pub(super) last_cursor_world: glam::DVec3,
-    pub(super) last_cursor_screen: iced::Point,
+    pub(super) last_cursor_world: std::cell::Cell<glam::DVec3>,
+    pub(super) last_cursor_screen: std::cell::Cell<iced::Point>,
     /// Base point (`App::last_point`) projected to viewport pixels, refreshed
     /// on cursor move. Lets the dynamic-input overlay place the distance label
     /// along the rubber-band line and the angle label at its end.
@@ -626,7 +626,7 @@ impl DocumentTab {
             pending_pause_tokens: None,
             last_cmd: None,
             last_draw_anchor: None,
-            snap_result: None,
+            snap_result: std::cell::Cell::new(None),
             active_grip: None,
             selected_grips: vec![],
             selected_grip_handles: vec![],
@@ -638,8 +638,8 @@ impl DocumentTab {
             wireframe: false,
             render_mode: codec::entities::ViewportRenderMode::Wireframe2D,
             visual_style: "Wireframe 2D".into(),
-            last_cursor_world: glam::DVec3::ZERO,
-            last_cursor_screen: iced::Point::ORIGIN,
+            last_cursor_world: std::cell::Cell::new(glam::DVec3::ZERO),
+            last_cursor_screen: std::cell::Cell::new(iced::Point::ORIGIN),
             last_point_screen: None,
             dyn_fields: Vec::new(),
             dyn_guide: crate::command::DynGuide::Polar,

@@ -29,7 +29,7 @@ impl OpenCADStudio {
             }
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         None
@@ -61,7 +61,7 @@ impl OpenCADStudio {
             );
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
     }
@@ -100,7 +100,7 @@ impl OpenCADStudio {
                 .push_output(crate::t!("MEASURE: 0 markers placed.").as_ref());
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
     }
@@ -156,7 +156,7 @@ impl OpenCADStudio {
                 .push_info("JOIN: no compatible objects joined to source.");
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         None
@@ -189,7 +189,7 @@ impl OpenCADStudio {
                 self.tabs[i].dirty = true;
                 self.tabs[i].scene.clear_preview_wire();
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.restore_pre_cmd_tangent();
                 self.command_line.push_output(
                     crate::tf!("JOIN: {count_in} object(s) joined into {count_out}.")
@@ -199,7 +199,7 @@ impl OpenCADStudio {
             }
             None => {
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.tabs[i].scene.clear_preview_wire();
                 self.restore_pre_cmd_tangent();
                 self.command_line.push_error(
@@ -233,7 +233,7 @@ impl OpenCADStudio {
                     );
                 if unchanged {
                     self.tabs[i].active_cmd = None;
-                    self.tabs[i].snap_result = None;
+                    self.tabs[i].snap_result.set( None);
                     self.tabs[i].scene.clear_preview_wire();
                     self.restore_pre_cmd_tangent();
                     self.command_line.push_output("BREAK: no geometry changed.");
@@ -264,7 +264,7 @@ impl OpenCADStudio {
                 self.tabs[i].dirty = true;
                 self.tabs[i].scene.clear_preview_wire();
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.restore_pre_cmd_tangent();
                 self.command_line
                     .push_output(crate::tf!("BREAK: {} fragment(s).", count).as_ref());
@@ -272,7 +272,7 @@ impl OpenCADStudio {
             }
             None => {
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.tabs[i].scene.clear_preview_wire();
                 self.restore_pre_cmd_tangent();
                 self.command_line
@@ -721,7 +721,7 @@ impl OpenCADStudio {
                 .push_output(crate::t!("HATCHEDIT: hatch updated.").as_ref());
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         None

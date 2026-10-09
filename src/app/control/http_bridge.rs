@@ -508,8 +508,7 @@ mod tests {
                 // until the person answers. Simulate the click right away.
                 assert_eq!(reply["status"], "accepted", "{reply}");
                 envelope.reply.send(reply);
-                app.tabs[app.active_tab].last_cursor_world =
-                    glam::DVec3::new(1.5, 2.5, 0.0);
+                app.tabs[app.active_tab].last_cursor_world.set(glam::DVec3::new(1.5, 2.5, 0.0));
                 let _ = app.update(crate::app::Message::ViewportLeftPress);
             } else if envelope.request["op"] == "get_selection" {
                 envelope.reply.send(reply);
@@ -590,7 +589,7 @@ mod tests {
         let reply = app.control_request(envelope.request).0;
         assert_eq!(reply["status"], "accepted", "{reply}");
         envelope.reply.send(reply);
-        app.tabs[app.active_tab].last_cursor_world = glam::DVec3::new(2.0, 3.0, 0.0);
+        app.tabs[app.active_tab].last_cursor_world.set(glam::DVec3::new(2.0, 3.0, 0.0));
         let _ = app.update(crate::app::Message::ViewportLeftPress);
         let mut polls = 0usize;
         let (_, body) = loop {

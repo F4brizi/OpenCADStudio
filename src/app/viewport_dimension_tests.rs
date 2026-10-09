@@ -368,13 +368,13 @@ fn viewport_dimension_preview_uses_candidate_scale_only_before_second_pick() {
         let sheet = app.dimension_preview_entities(i, target.world).unwrap();
         assert_eq!(preview_text(&app, &sheet[0]), "127");
         app.vp_snap_frame = Some(frame);
-        app.tabs[i].snap_result = Some(target);
+        app.tabs[i].snap_result.set( Some(target));
         let model_preview = app.dimension_preview_entities(i, target.world).unwrap();
         assert_eq!(preview_text(&app, &model_preview[0]), "1270");
         point(&mut app, frame, model, DVec3::X * 100.0);
         let other = ViewportFrame { viewport: Handle::new(0xFFFF), scale: frame.scale * 2.0, ..frame };
         app.vp_snap_frame = Some(other);
-        app.tabs[i].snap_result = Some(hit(other, model, DVec3::X * 100.0));
+        app.tabs[i].snap_result.set( Some(hit(other, model, DVec3::X * 100.0)));
         let placement = app.dimension_preview_entities(i, DVec3::new(60.0, 80.0, 0.0)).unwrap();
         assert_eq!(preview_text(&app, &placement[0]), "1270");
     }

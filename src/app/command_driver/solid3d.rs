@@ -193,7 +193,7 @@ impl OpenCADStudio {
             }
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.refresh_properties();
@@ -203,7 +203,7 @@ impl OpenCADStudio {
     pub(super) fn handle_thicken_entities(&mut self, handles: Vec<Handle>, distance: f64) -> Option<Task<Message>> {
         let i = self.active_tab;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
 
@@ -329,7 +329,7 @@ impl OpenCADStudio {
         };
         if handles.is_empty() {
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.tabs[i].scene.clear_preview_wire();
             self.restore_pre_cmd_tangent();
             return Some(Task::none());
@@ -444,7 +444,7 @@ impl OpenCADStudio {
             self.commit_undo_delta(i, pending);
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.refresh_properties();
@@ -563,7 +563,7 @@ impl OpenCADStudio {
             self.commit_undo_delta(i, pending);
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.refresh_properties();
@@ -705,7 +705,7 @@ impl OpenCADStudio {
             }
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.refresh_properties();
@@ -728,7 +728,7 @@ impl OpenCADStudio {
         let task =
             self.solid_edge_blend(handle, &edges, base_face, value, other_value, fillet);
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         task
@@ -738,7 +738,7 @@ impl OpenCADStudio {
         let i = self.active_tab;
         let task = self.solid_shell(handle, &actions, distance);
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         task
@@ -748,7 +748,7 @@ impl OpenCADStudio {
         let i = self.active_tab;
         let task = self.solid_subtract(&bases, &cutters, convert_meshes);
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         task
@@ -758,7 +758,7 @@ impl OpenCADStudio {
         let i = self.active_tab;
         let task = self.solid_slice(&targets, plane, keep_point);
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         task
@@ -768,7 +768,7 @@ impl OpenCADStudio {
         let i = self.active_tab;
         let task = self.solid_slice_surface(&targets, *cutter, keep_point);
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         task

@@ -4,7 +4,7 @@ impl OpenCADStudio {
     pub(super) fn handle_match_entity_layer(&mut self, dest: Vec<Handle>, src: Handle) {
         let i = self.active_tab;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         let src_layer = self.tabs[i]
             .scene
@@ -158,7 +158,7 @@ impl OpenCADStudio {
             self.command_line
                 .push_error(crate::t!("Source object not found.").as_ref());
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.tabs[i].scene.clear_preview_wire();
         }
         None

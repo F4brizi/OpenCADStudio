@@ -1081,7 +1081,7 @@ impl OpenCADStudio {
                         }
                         let it = item(self, spec)?;
                         let i = self.active_tab;
-                        self.tabs[i].last_cursor_world = glam::DVec3::new(xy[0], xy[1], xy.get(2).copied().unwrap_or(0.0));
+                        self.tabs[i].last_cursor_world.set(glam::DVec3::new(xy[0], xy[1], xy.get(2).copied().unwrap_or(0.0)));
                         self.block_palette.pressed = Some(it);
                         Message::ViewportLeftRelease
                     }

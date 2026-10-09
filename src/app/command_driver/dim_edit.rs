@@ -26,7 +26,7 @@ impl OpenCADStudio {
             self.command_line.push_output(&result.message);
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
     }
 
     pub(super) fn handle_edit_dimension_jog(&mut self, dimension: Handle, point: Option<glam::DVec3>) {
@@ -76,7 +76,7 @@ impl OpenCADStudio {
             );
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
     }
 
     pub(super) fn handle_space_dimensions(&mut self, base: Handle, others: Vec<Handle>, spacing: Option<f64>) {
@@ -88,7 +88,7 @@ impl OpenCADStudio {
                 .push_output(crate::t!("DIMSPACE  Spacing adjusted.").as_ref());
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
     }
 }
 

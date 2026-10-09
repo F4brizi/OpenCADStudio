@@ -193,7 +193,7 @@ impl OpenCADStudio {
             } else {
                 self.vp_snap_frame.filter(|frame| {
                     self.tabs[i]
-                        .snap_result
+                        .snap_result.get()
                         .is_some_and(|hit| hit.viewport == Some(frame.viewport))
                 })
             };

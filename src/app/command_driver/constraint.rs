@@ -36,7 +36,7 @@ impl OpenCADStudio {
             if !keep_command {
                 self.tabs[i].active_cmd = None;
             }
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.command_line.push_error(message);
             if keep_command {
                 if let Some(prompt) =
@@ -59,7 +59,7 @@ impl OpenCADStudio {
                 })
         {
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.command_line
                 .push_error("The constraint already exists on the selected objects.");
             return Some(Task::none());
@@ -98,7 +98,7 @@ impl OpenCADStudio {
         );
         self.tabs[i].dirty = true;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.command_line.push_output("Constraint applied.");
         self.refresh_properties();
         if let Some(pd) = pending {
@@ -176,7 +176,7 @@ impl OpenCADStudio {
         } else {
             self.tabs[i].active_cmd = None;
         }
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         if finishing {
             let summary = match equal_size(&self.tabs[i].scene.document, first) {
                 Some(EqualSize::Radius(_)) => "Radius of objects made equal",
@@ -331,7 +331,7 @@ impl OpenCADStudio {
             self.command_line
                 .push_output("The constraint already exists on the selected objects.");
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             return Some(Task::none());
         }
         // A refused value keeps the prompt open, as the reference's
@@ -486,7 +486,7 @@ impl OpenCADStudio {
         self.tabs[i].scene.refresh_dynamic_dimension_scales(true);
         self.tabs[i].dirty = true;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.refresh_properties();
         if let Some(pd) = pending {
             self.commit_undo_delta(i, pd);
@@ -541,7 +541,7 @@ impl OpenCADStudio {
             self.command_line
                 .push_output("The constraint already exists on the selected objects.");
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             return Some(Task::none());
         }
         if let Err(message) = self.tabs[i].scene.validate_parametric_constraint(
@@ -664,7 +664,7 @@ impl OpenCADStudio {
         self.tabs[i].scene.refresh_dynamic_dimension_scales(true);
         self.tabs[i].dirty = true;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.refresh_properties();
         if let Some(pd) = pending {
             self.commit_undo_delta(i, pd);
@@ -719,7 +719,7 @@ impl OpenCADStudio {
             self.command_line
                 .push_output("The constraint already exists on the selected objects.");
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             return Some(Task::none());
         }
         if let Err(message) = self.tabs[i].scene.validate_parametric_constraint(
@@ -867,7 +867,7 @@ impl OpenCADStudio {
         self.tabs[i].scene.refresh_dynamic_dimension_scales(true);
         self.tabs[i].dirty = true;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.refresh_properties();
         if let Some(pd) = pending {
             self.commit_undo_delta(i, pd);
@@ -1071,7 +1071,7 @@ impl OpenCADStudio {
         self.command_line
             .push_info(&crate::command::CadCommand::prompt(&command));
         self.tabs[i].active_cmd = Some(Box::new(command));
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         Task::none()
     }
 
@@ -1160,7 +1160,7 @@ impl OpenCADStudio {
                         self.command_line
                             .push_info(&crate::command::CadCommand::prompt(&command));
                         self.tabs[i].active_cmd = Some(Box::new(command));
-                        self.tabs[i].snap_result = None;
+                        self.tabs[i].snap_result.set( None);
                         return Some(Task::none());
                     }
                 };
@@ -1193,7 +1193,7 @@ impl OpenCADStudio {
             .is_some_and(|set| set.contains_axis_constraint(kind, &refs, direction))
         {
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.command_line
                 .push_error("The constraint already exists on the selected objects.");
             return Some(Task::none());
@@ -1315,7 +1315,7 @@ impl OpenCADStudio {
         );
         self.tabs[i].dirty = true;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.command_line
             .push_output(&format!("{axis} constraint applied."));
         self.refresh_properties();
@@ -1402,7 +1402,7 @@ impl OpenCADStudio {
             });
         if duplicate {
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.command_line
                 .push_error("The constraint already exists on the selected objects.");
             return Some(Task::none());
@@ -1445,7 +1445,7 @@ impl OpenCADStudio {
         );
         self.tabs[i].dirty = true;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.command_line
             .push_output("Symmetric constraint applied.");
         self.refresh_properties();
@@ -1476,7 +1476,7 @@ impl OpenCADStudio {
             None,
         ) {
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.command_line.push_error(message);
             return Some(Task::none());
         }
@@ -1518,7 +1518,7 @@ impl OpenCADStudio {
         );
         self.tabs[i].dirty = true;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.command_line.push_output("Constraint applied.");
         self.refresh_properties();
         if let Some(pd) = pending {
@@ -1543,7 +1543,7 @@ impl OpenCADStudio {
             None,
         ) {
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.command_line.push_error(message);
             return Some(Task::none());
         }
@@ -1585,7 +1585,7 @@ impl OpenCADStudio {
         );
         self.tabs[i].dirty = true;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.command_line.push_output("Constraint applied.");
         self.refresh_properties();
         if let Some(pd) = pending {
@@ -1610,7 +1610,7 @@ impl OpenCADStudio {
             None,
         ) {
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.command_line.push_error(message);
             return Some(Task::none());
         }
@@ -1629,7 +1629,7 @@ impl OpenCADStudio {
             });
         if duplicate {
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.command_line
                 .push_output("The Concentric constraint already exists.");
             return Some(Task::none());
@@ -1671,7 +1671,7 @@ impl OpenCADStudio {
         );
         self.tabs[i].dirty = true;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.command_line.push_output("Constraint applied.");
         self.refresh_properties();
         if let Some(pd) = pending {
@@ -1787,7 +1787,7 @@ impl OpenCADStudio {
             self.constraint_solve_mode,
         );
         self.tabs[i].dirty = true;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         if !multiple {
             self.tabs[i].active_cmd = None;
         }
@@ -1857,7 +1857,7 @@ impl OpenCADStudio {
             }
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.command_line
             .push_output(format!("{} coincident constraint(s) applied.", count).as_str());
     }
@@ -1909,7 +1909,7 @@ impl OpenCADStudio {
                     "Pick didn't land on a point (endpoint, center, or vertex) — enable an Endpoint/Center object snap and try again.",
                 );
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
             }
         }
         None
@@ -1948,7 +1948,7 @@ impl OpenCADStudio {
             "Equal Distance: a pick didn't land on a point (endpoint, center, or vertex) — enable an Endpoint/Center object snap and try again.",
         );
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         None
     }
 }

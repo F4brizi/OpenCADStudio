@@ -92,7 +92,7 @@ impl OpenCADStudio {
     pub(in crate::app) fn reset_space_interaction_state(&mut self) {
         let i = self.active_tab;
         self.tabs[i].scene.clear_preview_wire();
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.last_point = None;
         // Points collected in the space being left are meaningless in the new
         // one.
@@ -276,7 +276,7 @@ impl OpenCADStudio {
         self.grip_text_verts.clear();
         self.grip_text_slide = false;
         self.tabs[i].scene.clear_preview_wire();
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.refresh_selected_grips();
         self.refresh_properties();
         true

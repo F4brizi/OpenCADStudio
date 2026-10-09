@@ -486,7 +486,7 @@ impl OpenCADStudio {
     }
 
     pub(super) fn drop_block(&mut self, item: Item) -> Task<Message> {
-        let at = self.tabs[self.active_tab].last_cursor_world;
+        let at = self.tabs[self.active_tab].last_cursor_world.get();
         self.palette_insert(item, Some(at))
     }
 

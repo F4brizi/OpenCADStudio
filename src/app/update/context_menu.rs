@@ -949,7 +949,7 @@ mod transparent_tests {
             assert_eq!(active(&app), Some("LINE"));
 
             // Point cursor in +X direction from origin
-            app.tabs[0].last_cursor_world = glam::DVec3::new(10.0, 0.0, 0.0);
+            app.tabs[0].last_cursor_world.set(glam::DVec3::new(10.0, 0.0, 0.0));
 
             // Type "50" into command line and submit
             app.command_line.input = "50".to_string();
@@ -973,7 +973,7 @@ mod transparent_tests {
             assert_eq!(active(&app), Some("LINE"));
 
             // Point cursor in +Y direction from (50, 0)
-            app.tabs[0].last_cursor_world = glam::DVec3::new(50.0, 20.0, 0.0);
+            app.tabs[0].last_cursor_world.set(glam::DVec3::new(50.0, 20.0, 0.0));
 
             // Type "25" and submit
             app.command_line.input = "25".to_string();
@@ -993,7 +993,7 @@ mod transparent_tests {
             assert!((lines[1].end.x - 50.0).abs() < 1e-6 && (lines[1].end.y - 25.0).abs() < 1e-6);
 
             // Point cursor in -X direction from (50, 25) using feed_active_cmd
-            app.tabs[0].last_cursor_world = glam::DVec3::new(0.0, 25.0, 0.0);
+            app.tabs[0].last_cursor_world.set(glam::DVec3::new(0.0, 25.0, 0.0));
             let _ = app.feed_active_cmd("50");
             let lines: Vec<_> = app.tabs[0]
                 .scene

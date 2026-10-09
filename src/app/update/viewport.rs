@@ -1565,7 +1565,7 @@ impl OpenCADStudio {
                 _ => reference_snap_hit.or(snap_hit),
             };
 
-            self.tabs[i].snap_result = snap_hit;
+            self.tabs[i].snap_result.set( snap_hit);
 
             // OTRACK acquisition needs access to the original wire geometry so, once a
             // reference point has dwelt long enough, it can capture the segment directions
@@ -1627,9 +1627,10 @@ impl OpenCADStudio {
             } else {
                 snap_hit.map(|s| s.world).unwrap_or(raw)
             };
-            if let Some(s) = self.tabs[i].snap_result.as_mut() {
+            if let Some(mut s) = self.tabs[i].snap_result.get() {
                 s.screen.x += tile_b.x;
                 s.screen.y += tile_b.y;
+                self.tabs[i].snap_result.set(Some(s));
             }
 
             if axis_lock.is_none()
@@ -1706,8 +1707,8 @@ impl OpenCADStudio {
             // The overlay builds the active tracking guide from `otrack_active.base`
             // to `last_cursor_world`. Keep it synchronized with the actual point used
             // by the grip, otherwise the guide and the edited geometry diverge.
-            self.tabs[i].last_cursor_world = snapped;
-            self.tabs[i].last_cursor_screen = p_full;
+            self.tabs[i].last_cursor_world.set( snapped);
+            self.tabs[i].last_cursor_screen.set( p_full);
 
             // Project the grip's original position into full-canvas coordinates.
             // Dynamic Input uses this as the polar Distance/Angle anchor.
@@ -1741,7 +1742,7 @@ impl OpenCADStudio {
                     }
                 }
                 snapped = opposite + width_axis * width + height_axis * height;
-                self.tabs[i].last_cursor_world = snapped;
+                self.tabs[i].last_cursor_world.set( snapped);
             }
             let delta = snapped - grip.last_world;
             let menu_action = match grip.mode {
@@ -2040,7 +2041,7 @@ impl OpenCADStudio {
                 height: vp_size.1,
             };
             let world = self.cursor_model_point(i, &edit_cam, p, bounds);
-            self.tabs[i].last_cursor_world = world;
+            self.tabs[i].last_cursor_world.set( world);
         }
 
         // A pending client pick (`getpoint` or `user_select`) is a command-grade
@@ -2108,9 +2109,9 @@ impl OpenCADStudio {
                 gr,
                 None,
             );
-            self.tabs[i].snap_result = snap_hit;
-            self.tabs[i].last_cursor_world =
-                snap_hit.map(|hit| hit.world).unwrap_or(cursor_world);
+            self.tabs[i].snap_result.set( snap_hit);
+            self.tabs[i].last_cursor_world.set(
+                snap_hit.map(|hit| hit.world).unwrap_or(cursor_world));
         }
 
         // Rollover highlight: when idle (no active command, no
@@ -2236,7 +2237,7 @@ impl OpenCADStudio {
                     .active_cmd
                     .as_ref()
                     .is_some_and(|command| command.entity_pick_accepts_points());
-            self.tabs[i].snap_result = if (needs_entity && !entity_pick_takes_points)
+            self.tabs[i].snap_result.set( if (needs_entity && !entity_pick_takes_points)
                 || is_gathering
                 || needs_structure
             {
@@ -2275,7 +2276,7 @@ impl OpenCADStudio {
                     gr,
                     construction_ray,
                 )
-            };
+            });
 
             // Paper-space snapping through layout viewports. `edit_cam`
             // is None here, so `cursor_world` is the paper point and the sheet
@@ -2294,11 +2295,11 @@ impl OpenCADStudio {
                     self.paper_viewport_snap(i, p_full, vp_size, cursor_world)
                 {
                     let merged =
-                        crate::snap::merge_snap(self.tabs[i].snap_result, Some(vp_hit), p_full);
+                        crate::snap::merge_snap(self.tabs[i].snap_result.get(), Some(vp_hit), p_full);
                     if merged.is_some_and(|hit| hit.viewport.is_some()) {
                         self.vp_snap_frame = Some(frame);
                     }
-                    self.tabs[i].snap_result = merged;
+                    self.tabs[i].snap_result.set( merged);
                 }
             }
 
@@ -2330,8 +2331,8 @@ impl OpenCADStudio {
                     self.snapper.is_on_3d(crate::snap::SnapType::NearestFace),
                 );
                 if face_hit.is_some() {
-                    self.tabs[i].snap_result =
-                        crate::snap::merge_snap(self.tabs[i].snap_result, face_hit, p);
+                    self.tabs[i].snap_result.set(
+                        crate::snap::merge_snap(self.tabs[i].snap_result.get(), face_hit, p));
                 }
             }
 
@@ -2395,12 +2396,12 @@ impl OpenCADStudio {
                     if tracked_snap
                         .is_some_and(|hit| hit.snap_type == crate::snap::SnapType::Intersection)
                     {
-                        self.tabs[i].snap_result = tracked_snap;
+                        self.tabs[i].snap_result.set( tracked_snap);
                     }
                 }
             }
             self.snapper.update_otrack_dwell(
-                self.tabs[i].snap_result,
+                self.tabs[i].snap_result.get(),
                 &snap_candidates,
                 view_rot,
                 eye,
@@ -2419,7 +2420,7 @@ impl OpenCADStudio {
                 self.active_otrack_hit(
                     i,
                     cursor_world,
-                    self.tabs[i].snap_result,
+                    self.tabs[i].snap_result.get(),
                     self.last_point,
                     !is_window_corner,
                     view_rot,
@@ -2437,7 +2438,7 @@ impl OpenCADStudio {
             // the point onto the line through last_point parallel to the
             // acquired reference, and drive the alignment guide off it.
             // (#277)
-            if axis_lock.is_none() && self.tabs[i].snap_result.is_none() && otrack_hit.is_none() {
+            if axis_lock.is_none() && self.tabs[i].snap_result.get().is_none() && otrack_hit.is_none() {
                 if let Some(par) = self.snapper.parallel_snap(
                     cursor_world,
                     self.last_point,
@@ -2451,7 +2452,7 @@ impl OpenCADStudio {
                         self.otrack_active = Some((base, dir));
                         self.otrack_cross = None;
                     }
-                    self.tabs[i].snap_result = Some(par);
+                    self.tabs[i].snap_result.set( Some(par));
                 }
             }
 
@@ -2459,7 +2460,7 @@ impl OpenCADStudio {
                 let mut pt: glam::DVec3 =
                     if let (Some(dir), Some(base)) = (axis_lock, self.last_point) {
                         let point = self.tabs[i]
-                            .snap_result
+                            .snap_result.get()
                             .map(|snap| snap.world)
                             .unwrap_or(cursor_world);
                         axis_lock_apply(point, base, dir)
@@ -2469,11 +2470,11 @@ impl OpenCADStudio {
                         // Snap runs in model space (viewport camera or the
                         // model/paper view), so the result is already model.
                         let mut pt = self.tabs[i]
-                            .snap_result
+                            .snap_result.get()
                             .map(|s| s.world)
                             .unwrap_or(cursor_world);
                         let osnap_locked = self.tabs[i]
-                            .snap_result
+                            .snap_result.get()
                             .is_some_and(|s| s.snap_type != crate::snap::SnapType::Grid);
                         if !osnap_locked && !is_window_corner && !uses_command_cursor_plane {
                             if let Some(base) = self.last_point {
@@ -2511,7 +2512,7 @@ impl OpenCADStudio {
                     && self.tabs[i].active_ucs.is_none()
                     && !uses_command_cursor_plane
                     && !snap_keeps_elevation(
-                        self.tabs[i].snap_result.map(|s| s.snap_type),
+                        self.tabs[i].snap_result.get().map(|s| s.snap_type),
                     )
                 {
                     pt.z = 0.0;
@@ -2532,7 +2533,7 @@ impl OpenCADStudio {
                     .and_then(|command| command.cursor_axis())
                     .and_then(|(origin, direction)| {
                         command_axis_point(
-                            self.tabs[i].snap_result,
+                            self.tabs[i].snap_result.get(),
                             p,
                             bounds,
                             view_rot,
@@ -2553,14 +2554,14 @@ impl OpenCADStudio {
                     && self.tabs[i].active_cmd.is_some()
                     && self.tabs[i].dyn_fields.iter().any(|f| f.buffer.is_some());
                 if locked {
-                    self.tabs[i].last_cursor_world = effective;
+                    self.tabs[i].last_cursor_world.set( effective);
                     self.dyn_resolve_point().unwrap_or(effective)
                 } else {
                     effective
                 }
             };
-            self.tabs[i].last_cursor_world = effective;
-            self.tabs[i].last_cursor_screen = p_full;
+            self.tabs[i].last_cursor_world.set( effective);
+            self.tabs[i].last_cursor_screen.set( p_full);
             // Project the step anchor (an explicit `dyn_anchor` or the
             // last point) so the dynamic-input overlay can place its
             // guide geometry and labels.
@@ -2630,7 +2631,7 @@ impl OpenCADStudio {
                         (ndc.x + 1.0) * 0.5 * bounds.width,
                         (1.0 - ndc.y) * 0.5 * bounds.height,
                     );
-                    self.tabs[i].snap_result = Some(SnapResult {
+                    self.tabs[i].snap_result.set( Some(SnapResult {
                         world,
                         screen,
                         snap_type: SnapType::ObjectPick,
@@ -2643,7 +2644,7 @@ impl OpenCADStudio {
                         source: None,
                         secondary_source: None,
                         model_point: None,
-                    });
+                    }));
                     if let Some(cmd) = self.tabs[i].active_cmd.as_mut() {
                         cmd.set_acquisition_hint(Some(pick.label));
                     }
@@ -2654,9 +2655,10 @@ impl OpenCADStudio {
 
             // Snap glyph is positioned in canvas space; shift the
             // tile-local snap screen point back to the full canvas.
-            if let Some(s) = self.tabs[i].snap_result.as_mut() {
+            if let Some(mut s) = self.tabs[i].snap_result.get() {
                 s.screen.x += tile_b.x;
                 s.screen.y += tile_b.y;
+                self.tabs[i].snap_result.set(Some(s));
             }
 
             // Give the command the current UCS + Ctrl state before it
@@ -2670,7 +2672,7 @@ impl OpenCADStudio {
                     .as_ref()
                     .map(|c| c.object_pick_hover_previews(&self.tabs[i].scene, effective))
                     .unwrap_or_default();
-                let live_tangent = self.tabs[i].snap_result.and_then(|s| {
+                let live_tangent = self.tabs[i].snap_result.get().and_then(|s| {
                     if s.snap_type == crate::snap::SnapType::Tangent {
                         s.tangent_obj
                     } else {
@@ -2815,7 +2817,7 @@ impl OpenCADStudio {
             } else if let Some(wires) = self.dimension_preview_wires(i, effective) {
                 wires
             } else {
-                let live_tangent = self.tabs[i].snap_result.and_then(|s| {
+                let live_tangent = self.tabs[i].snap_result.get().and_then(|s| {
                     if s.snap_type == crate::snap::SnapType::Tangent {
                         s.tangent_obj
                     } else {
@@ -2927,7 +2929,7 @@ impl OpenCADStudio {
             // Idle (no command, no pending client pick): the snap marker is
             // command-only, so clear it — a pending client pick keeps the
             // marker its move-time snap block above computed.
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
         }
 
         self.sync_dyn_fields();
@@ -3168,8 +3170,8 @@ impl OpenCADStudio {
             None,
         );
         let world = snap_hit.map(|s| s.world).unwrap_or(raw);
-        self.tabs[i].snap_result = snap_hit;
-        if let Some(s) = self.tabs[i].snap_result.as_mut() {
+        self.tabs[i].snap_result.set( snap_hit);
+        if let Some(mut s) = self.tabs[i].snap_result.get() {
             // Snap marker and its extension anchors are pane-local; lift them to
             // absolute canvas px.
             s.screen.x += tile_b.x;
@@ -3177,6 +3179,7 @@ impl OpenCADStudio {
             if let Some(base) = s.extension_base.as_mut() {
                 base.x += tile_b.x;
                 base.y += tile_b.y;
+                self.tabs[i].snap_result.set(Some(s));
             }
             if let Some(base) = s.extension_base2.as_mut() {
                 base.x += tile_b.x;
@@ -3434,7 +3437,7 @@ impl OpenCADStudio {
                 .as_ref()
                 .is_some_and(|session| session.document_id == self.tabs[i].id);
             if answers {
-                let world = self.tabs[i].last_cursor_world;
+                let world = self.tabs[i].last_cursor_world.get();
                 self.resolve_get_point(Some([world.x, world.y, world.z]));
                 return Task::none();
             }
@@ -3794,7 +3797,7 @@ impl OpenCADStudio {
         // rebases only the block; elsewhere it writes the model/viewport UCS.
         if self.ucs_grip_drag.take().is_some() {
             self.commit_active_ucs_change(i, "UCS");
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.snapper.from_point = None;
             let mut sel = self.tabs[i].scene.selection.borrow_mut();
             sel.left_down = false;
@@ -3900,7 +3903,7 @@ impl OpenCADStudio {
                 height: vh,
             };
 
-            let snap_taken = self.tabs[i].snap_result.take();
+            let snap_taken = self.tabs[i].snap_result.get().take();
             let tangent_obj_at_click = snap_taken.and_then(|s| s.tangent_obj);
 
             let world_pt = {
@@ -4173,7 +4176,7 @@ impl OpenCADStudio {
                     && self.tabs[i].active_cmd.is_some()
                     && self.tabs[i].dyn_fields.iter().any(|f| f.buffer.is_some())
                 {
-                    self.tabs[i].last_cursor_world = pt;
+                    self.tabs[i].last_cursor_world.set( pt);
                     if let Some(r) = self.dyn_resolve_point() {
                         pt = r;
                     }
@@ -6681,7 +6684,7 @@ properties={:.1}ms picked={}",
         }
         // Placement confirmed — keep the just-added leader.
         self.grip_add_provisional = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         if let Some(vertex_id) = added_vertex_focus {
             self.tabs[i].properties.prop_vertex = vertex_id;
             self.tabs[i].properties.prop_vertex_indicator_active = true;
@@ -6724,7 +6727,7 @@ properties={:.1}ms picked={}",
             self.finish_pending_history(i);
             self.tabs[i].dirty = true;
         }
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         // Re-arm: the grip sits at its origin again over the restored shape.
         let mut again = grip;
         let delta = again.last_world - again.origin_world;
@@ -7516,7 +7519,7 @@ mod selection_preview_tests {
         let _ = app.on_viewport_move(Point::new(cursor.x, cursor.y));
 
         let hit = app.tabs[i]
-            .snap_result
+            .snap_result.get()
             .expect("endpoint snap missed the 3D vertex");
         assert_eq!(hit.snap_type, SnapType::Endpoint);
         assert!(
@@ -7524,7 +7527,7 @@ mod selection_preview_tests {
             "snap landed off-elevation: {:?}",
             hit.world
         );
-        let preview = app.tabs[i].last_cursor_world;
+        let preview = app.tabs[i].last_cursor_world.get();
         assert!(
             (preview.z - 25.0).abs() < 1e-6,
             "command point lost its elevation: {preview:?}"
@@ -7606,7 +7609,7 @@ mod selection_preview_tests {
         let _ = app.on_viewport_move(Point::new(cursor.x, cursor.y));
 
         let hit = app.tabs[i]
-            .snap_result
+            .snap_result.get()
             .expect("no snap point on the box corner");
         assert_eq!(
             hit.snap_type,
@@ -7620,7 +7623,7 @@ mod selection_preview_tests {
             "snap missed the corner: {:?} vs {target:?}",
             hit.world
         );
-        let preview = app.tabs[i].last_cursor_world;
+        let preview = app.tabs[i].last_cursor_world.get();
         assert!(
             (preview - target).length() < 1e-6,
             "command point left the corner: {preview:?} vs {target:?}"
@@ -7689,9 +7692,9 @@ mod selection_preview_tests {
         let _ = app.on_viewport_move(Point::new(cursor.x, cursor.y));
 
         assert!(
-            app.tabs[i].snap_result.is_none(),
+            app.tabs[i].snap_result.get().is_none(),
             "3D master off must hide solid corners, got {:?}",
-            app.tabs[i].snap_result.map(|s| (s.snap_type, s.world))
+            app.tabs[i].snap_result.get().map(|s| (s.snap_type, s.world))
         );
     }
 
@@ -7747,7 +7750,7 @@ mod selection_preview_tests {
         let _ = app.on_viewport_move(Point::new(cursor.x, cursor.y));
 
         let hit = app.tabs[i]
-            .snap_result
+            .snap_result.get()
             .expect("no snap point on the box face");
         assert_eq!(
             hit.snap_type,
@@ -7815,7 +7818,7 @@ mod selection_preview_tests {
         let _ = app.on_viewport_move(Point::new(cursor.x, cursor.y));
 
         let hit = app.tabs[i]
-            .snap_result
+            .snap_result.get()
             .expect("no snap point on the box face");
         assert_eq!(
             hit.snap_type,
@@ -7983,7 +7986,7 @@ mod selection_preview_tests {
         let _ = app.on_viewport_move(Point::new(cursor.x, cursor.y));
 
         let hit = app.tabs[i]
-            .snap_result
+            .snap_result.get()
             .expect("no snap point on the box edge");
         assert_eq!(
             hit.snap_type,

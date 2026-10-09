@@ -233,7 +233,7 @@ impl super::OpenCADStudio {
         self.tabs[i].dirty = true;
         if let Some(pending) = pending { self.commit_undo_delta(i, pending); }
         self.tabs[i].scene.clear_preview_wire();
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set(None);
         if let Some(command) = self.tabs[i].active_cmd.as_mut() {
             command.on_presspull_applied(true);
         }

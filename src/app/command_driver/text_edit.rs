@@ -14,14 +14,14 @@ impl OpenCADStudio {
             unreachable!("router only routes the matching variant");
         };
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.open_mtext_editor(pos, handle, &initial, height, template.map(|m| *m));
     }
 
     pub(super) fn handle_suspend_for_mtext_input(&mut self, pos: glam::DVec3, initial: String, height: f64) {
         let i = self.active_tab;
         self.tabs[i].suspended_cmd = self.tabs[i].active_cmd.take();
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.command_mtext_input = true;
@@ -41,7 +41,7 @@ impl OpenCADStudio {
             unreachable!("router only routes the matching variant");
         };
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.open_text_inline(
             pos,
             handle,
@@ -59,7 +59,7 @@ impl OpenCADStudio {
     ) {
         let i = self.active_tab;
         self.tabs[i].suspended_cmd = self.tabs[i].active_cmd.take();
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         let height = entity.height;
@@ -76,7 +76,7 @@ impl OpenCADStudio {
     pub(super) fn handle_edit_text_entity(&mut self, handle: Handle) -> Task<Message> {
         let i = self.active_tab;
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.ribbon.deactivate_tool();
@@ -98,7 +98,7 @@ impl OpenCADStudio {
         }
         let cmd = self.tabs[i].active_cmd.take();
         self.tabs[i].suspended_cmd = cmd;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         self.ribbon.deactivate_tool();
@@ -112,7 +112,7 @@ impl OpenCADStudio {
         self.command_line
             .push_output(crate::tf!("TEXTEDITMODE set to {display_val}").as_ref());
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
     }
 
@@ -180,7 +180,7 @@ impl OpenCADStudio {
             );
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
     }
@@ -237,7 +237,7 @@ impl OpenCADStudio {
                 .push_error(crate::t!("DDEDIT: entity type not supported.").as_ref());
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.restore_pre_cmd_tangent();
         None

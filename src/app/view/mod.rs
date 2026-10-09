@@ -514,9 +514,9 @@ bg={bg_ms:.1}ms n={view_count}"
             // `sel_ref` is a borrowed view for field reads; the widget owns
             // the Arc clone. No `selection` mutation occurs inside this block.
             let sel_ref = tab.scene.selection.borrow();
-            let snap_info = tab.snap_result.map(|s| (s.screen, s.snap_type));
-            let snap_ext_base = tab.snap_result.and_then(|s| s.extension_base);
-            let snap_ext_base2 = tab.snap_result.and_then(|s| s.extension_base2);
+            let snap_info = tab.snap_result.get().map(|s| (s.screen, s.snap_type));
+            let snap_ext_base = tab.snap_result.get().and_then(|s| s.extension_base);
+            let snap_ext_base2 = tab.snap_result.get().and_then(|s| s.extension_base2);
 
             let show_grips = tab.active_cmd.is_none()
                 || tab
@@ -786,7 +786,7 @@ bg={bg_ms:.1}ms n={view_count}"
             // both are drawn — one guide alone hides what the point is (#1313).
             let otrack_lines: Vec<(iced::Point, iced::Point)> = match otrack_proj {
                 Some((view_rot, eye, ob)) => {
-                    let a = ost_project(tab.last_cursor_world, view_rot, eye, ob);
+                    let a = ost_project(tab.last_cursor_world.get(), view_rot, eye, ob);
                     self.otrack_active
                         .into_iter()
                         .chain(self.otrack_cross)
@@ -953,18 +953,7 @@ bg={bg_ms:.1}ms n={view_count}"
         };
 
         mark("viewport_mouse");
-        let viewport_mouse = mouse_area(container(
-            iced::widget::Space::new().width(Fill).height(Fill),
-        ))
-        .on_move(Message::ViewportMove)
-        .on_press(Message::ViewportLeftPress)
-        .on_release(Message::ViewportLeftRelease)
-        .on_right_press(Message::ViewportRightPress)
-        .on_right_release(Message::ViewportRightRelease)
-        .on_middle_press(Message::ViewportMiddlePress)
-        .on_middle_release(Message::ViewportMiddleRelease)
-        .on_scroll(Message::ViewportScroll)
-        .on_exit(Message::ViewportExit);
+        let viewport_mouse = crate::ui::viewport_input::ViewportInput::new();
 
         let desk_bg = self.model_space.resolve_desk_bg();
         let desk_color = Color {
@@ -1002,7 +991,7 @@ bg={bg_ms:.1}ms n={view_count}"
             && (tab.active_cmd.is_some() || tab.active_grip.is_some())
             && (!tab.dyn_fields.is_empty() || dyn_picks_object)
         {
-            let w = tab.last_cursor_world;
+            let w = tab.last_cursor_world.get();
             let base = tab.dyn_anchor.or(self.last_point);
             let label_screen = tab
                 .active_cmd
@@ -1189,7 +1178,7 @@ bg={bg_ms:.1}ms n={view_count}"
             };
 
             Some(crate::ui::overlay::dynamic_input_overlay(
-                tab.last_cursor_screen,
+                tab.last_cursor_screen.get(),
                 tab.last_point_screen,
                 tab.dyn_ref_screen,
                 label_screen,
@@ -2217,7 +2206,7 @@ bg={bg_ms:.1}ms n={view_count}"
                             p
                         }
                     };
-                    let cursor_coord = to_readout(tab.last_cursor_world);
+                    let cursor_coord = to_readout(tab.last_cursor_world.get());
                     // The last picked point (same UCS as the cursor) drives the
                     // static ($COORDS 0) and polar ($COORDS 2) readouts.
                     let last_coord = self.last_point.map(to_readout);

@@ -190,7 +190,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         if let Some(pd) = pending {
             self.commit_undo_delta(i, pd);
@@ -287,7 +287,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         if let Some(name) = insert_block_name {
             self.record_block_insert(&name);
@@ -435,7 +435,7 @@ impl OpenCADStudio {
         };
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         if let Some(pd) = pending {
             self.commit_undo_delta(i, pd);
         }
@@ -567,7 +567,7 @@ impl OpenCADStudio {
         }
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         self.command_line
             .push_output(crate::tf!("QDIM  {made} dimensions created.").as_ref());
@@ -605,7 +605,7 @@ impl OpenCADStudio {
         }
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
     }
 
@@ -640,7 +640,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         self.ribbon.deactivate_tool();
         if let Some(pd) = pending {
@@ -700,7 +700,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         self.ribbon.deactivate_tool();
         if let Some(pd) = pending {
@@ -745,7 +745,7 @@ impl OpenCADStudio {
                 }
                 self.tabs[i].scene.clear_preview_wire();
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.command_line
                     .push_output(crate::tf!("Block \"{name}\" created.").as_ref());
                 self.refresh_properties();
@@ -784,7 +784,7 @@ impl OpenCADStudio {
                 }
                 self.tabs[i].scene.clear_preview_wire();
                 self.tabs[i].active_cmd = None;
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 self.command_line
                     .push_output(crate::tf!("Block \"{name}\" created.").as_ref());
                 self.refresh_properties();
@@ -811,7 +811,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         self.refresh_properties();
         if let Some(pd) = pending {
@@ -839,7 +839,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         self.refresh_properties();
         if let Some(pd) = pending {
@@ -882,7 +882,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         self.refresh_properties();
         if let Some(pd) = pending {
@@ -911,7 +911,7 @@ impl OpenCADStudio {
         self.tabs[i].dirty = true;
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
         self.refresh_properties();
         if let Some(pd) = pending {
@@ -948,7 +948,7 @@ impl OpenCADStudio {
         }
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.refresh_properties();
         None
     }
@@ -979,7 +979,7 @@ impl OpenCADStudio {
             );
         }
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.tabs[i].scene.clear_preview_wire();
         self.refresh_properties();
         None
@@ -1042,7 +1042,7 @@ impl OpenCADStudio {
                 } else {
                     self.tabs[i].active_cmd = None;
                 }
-                self.tabs[i].snap_result = None;
+                self.tabs[i].snap_result.set( None);
                 if let Some(n) = insert_name {
                     self.record_block_insert(&n);
                 }
@@ -1147,7 +1147,7 @@ impl OpenCADStudio {
             self.finish_live_entity_history(i, handle);
             self.tabs[i].scene.clear_preview_wire();
             self.tabs[i].active_cmd = None;
-            self.tabs[i].snap_result = None;
+            self.tabs[i].snap_result.set( None);
             self.restore_pre_cmd_tangent();
         } else {
             let prompt = self.tabs[i].active_cmd.as_ref().map(|c| c.prompt());
@@ -1165,7 +1165,7 @@ impl OpenCADStudio {
         self.finish_live_entity_history(i, handle);
         self.tabs[i].scene.clear_preview_wire();
         self.tabs[i].active_cmd = None;
-        self.tabs[i].snap_result = None;
+        self.tabs[i].snap_result.set( None);
         self.restore_pre_cmd_tangent();
     }
 
