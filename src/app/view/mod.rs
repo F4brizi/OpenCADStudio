@@ -916,6 +916,7 @@ bg={bg_ms:.1}ms n={view_count}"
                 hover_locked,
                 crosshair_background(tab, is_paper),
                 crate::ui::overlay::CrosshairOptions {
+                    hardware_cursor: self.graphics_prefs.compat_renderer || crate::gpu_backend::active_gpu().backend.as_deref() == Some("gl"),
                     size_percent: self.cursor_size,
                     pick_box: self.pick_box,
                     cursor_type: self.cursor_type,
@@ -953,7 +954,7 @@ bg={bg_ms:.1}ms n={view_count}"
         };
 
         mark("viewport_mouse");
-        let viewport_mouse = crate::ui::viewport_input::ViewportInput::new(&tab.last_cursor_screen, tab.scene.selection.clone());
+        let viewport_mouse = crate::ui::viewport_input::ViewportInput::new(&tab.last_cursor_screen, tab.scene.selection.clone(), self.graphics_prefs.compat_renderer || crate::gpu_backend::active_gpu().backend.as_deref() == Some("gl"));
 
         let desk_bg = self.model_space.resolve_desk_bg();
         let desk_color = Color {

@@ -13,13 +13,15 @@ pub struct ViewportInputState {
 pub struct ViewportInput<'a> {
     pub last_cursor_screen: &'a std::cell::Cell<Point>,
     pub selection: Arc<RefCell<SelectionState>>,
+    pub hardware_cursor: bool,
 }
 
 impl<'a> ViewportInput<'a> {
-    pub fn new(last_cursor_screen: &'a std::cell::Cell<Point>, selection: Arc<RefCell<SelectionState>>) -> Self {
+    pub fn new(last_cursor_screen: &'a std::cell::Cell<Point>, selection: Arc<RefCell<SelectionState>>, hardware_cursor: bool) -> Self {
         Self {
             last_cursor_screen,
             selection,
+            hardware_cursor,
         }
     }
 }
@@ -70,15 +72,21 @@ where
             Event::Mouse(mouse::Event::CursorMoved { position }) => {
                 let now = std::time::Instant::now();
                 let emit = match state.last_move {
-                    Some(last) => now.duration_since(last).as_millis() > 30, // ~30 fps tick
+                    Some(last) => now.duration_since(last).as_millis() > 66, // ~15 fps tick for heavy UI rebuilds/snapping
                     None => true,
                 };
                 
                 self.last_cursor_screen.set(*position);
                 self.selection.borrow_mut().last_move_pos = Some(*position);
-                shell.request_redraw();
+                
+                if !self.hardware_cursor {
+                    shell.request_redraw();
+                }
 
                 if emit {
+                    if self.hardware_cursor {
+                        shell.request_redraw();
+                    }
                     shell.publish(Message::ViewportMove(*position));
                     state.last_move = Some(now);
                 }

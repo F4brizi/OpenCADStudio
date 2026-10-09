@@ -242,6 +242,7 @@ pub struct CrosshairOptions {
     /// Draw only the pickbox: the active command previews a line that the
     /// full-length arms would cover.
     pub hide_arms: bool,
+    pub hardware_cursor: bool,
     /// Explicit object-snap marker colour; `None` picks one that reads on
     /// the canvas.
     pub snap_color: Option<[u8; 3]>,
@@ -1269,7 +1270,11 @@ impl canvas::Program<Message> for SelectionCanvas {
         // through to a sibling — `Hidden` is the explicit "no cursor"
         // signal that actually suppresses the OS arrow.
         if cursor.is_over(bounds) && self.crosshair.cursor_type == CursorType::Crosshair {
-            mouse::Interaction::Hidden
+            if self.crosshair.hardware_cursor {
+                mouse::Interaction::Crosshair
+            } else {
+                mouse::Interaction::Hidden
+            }
         } else {
             mouse::Interaction::default()
         }
@@ -1944,7 +1949,7 @@ impl canvas::Program<Message> for SelectionCanvas {
                 // The arms stay only for the normal (non-pending) cursor: a
                 // waiting pick shows the box alone, regardless of the UCS
                 // rotation, so the square is unmistakable.
-                if !pick_pending && !self.crosshair.hide_arms {
+                if !pick_pending && !self.crosshair.hide_arms && !self.crosshair.hardware_cursor {
                     for angle in base_angles {
                         let rad = (angle + self.crosshair.snap_angle_deg as f64).to_radians();
                         let dir = Point::new(rad.cos() as f32, -rad.sin() as f32);
